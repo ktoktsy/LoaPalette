@@ -1,0 +1,62 @@
+{
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "ロアカウンター" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロアカウンター"
+          }
+        }
+      }
+    },
+    "デッキリスト" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デッキリスト"
+          }
+        }
+      }
+    },
+    "カード検索" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カード検索"
+          }
+        }
+      }
+    },
+    "ニュース" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ニュース"
+          }
+        }
+      }
+    },
+    "設定" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
+
