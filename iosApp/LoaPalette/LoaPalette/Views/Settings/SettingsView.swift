@@ -9,18 +9,20 @@ import SwiftUI
 
 struct SettingsView: View {
     var body: some View {
-        Color(.accent)
-            .ignoresSafeArea()
-            .overlay {
-                Text(String(localized: "設定"))
-                    .font(.largeTitle)
-                    .foregroundColor(.primary)
+        NavigationStack {
+            Form {
+                Section {
+                    ForEach(0..<10) { item in
+                        Text("item\(item)")
+                    }
+                }
             }
-            .toolbar(.visible, for: .tabBar)
+            .scrollContentBackground(.hidden)
+            .navigationTitle(String(localized: "設定"))
+        }
     }
 }
 
 #Preview {
     SettingsView()
 }
-
