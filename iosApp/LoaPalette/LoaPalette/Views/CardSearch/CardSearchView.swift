@@ -8,15 +8,25 @@
 import SwiftUI
 
 struct CardSearchView: View {
+    @State var searchText = ""
+
     var body: some View {
-        Color(.accent)
-            .ignoresSafeArea()
-            .overlay {
-                Text(String(localized: "カード検索"))
-                    .font(.largeTitle)
-                    .foregroundColor(.primary)
+        NavigationStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                Grid {
+                    ForEach(1..<100) { item in
+                       GridRow {
+                           Text(String(item))
+                               .font(.largeTitle)
+                               .frame(maxWidth: .infinity)
+                        }
+
+                    }
+                }
+                .searchable(text: $searchText)
             }
-            .toolbar(.visible, for: .tabBar)
+        }
+        .tabBarMinimizeBehavior(.onScrollDown)
     }
 }
 
