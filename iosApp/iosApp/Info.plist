@@ -48,6 +48,8 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+    <key>NewsURL</key>
+    <string>https://www.takaratomy.co.jp/products/disneylorcana/news/</string>
 </dict>
 </plist>
 

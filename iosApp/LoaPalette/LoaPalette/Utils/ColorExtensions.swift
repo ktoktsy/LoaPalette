@@ -14,4 +14,3 @@ extension Color {
     /// アプリのアクセントカラー（メインカラーと同じ）
     static let appAccent = Color("AccentColor", bundle: .main)
 }
-
