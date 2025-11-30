@@ -80,4 +80,3 @@ struct CounterSection: View {
         }
     }
 }
-
