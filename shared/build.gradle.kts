@@ -38,6 +38,9 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
             }
         }
 
@@ -48,11 +51,15 @@ kotlin {
                 implementation(libs.androidx.compose.material3)
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.ktor.client.android)
             }
         }
 
         val iosMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
         }
 
         val iosX64Main by getting {
