@@ -16,8 +16,18 @@ struct CardSearchView: View {
         NavigationStack {
             VStack {
                 if viewModel.searchState == .loading {
-                    ProgressView("検索中...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 8),
+                            GridItem(.flexible(), spacing: 8)
+                        ], spacing: 16) {
+                            ForEach(0..<8) { _ in
+                                CardPlaceholderView()
+                                    .shimmer()
+                            }
+                        }
+                        .padding()
+                    }
                 } else if let errorMessage = viewModel.errorMessage {
                     VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.triangle")
@@ -126,6 +136,78 @@ struct CardItemView: View {
         .background(Color(.systemBackground))
         .cornerRadius(8)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+    }
+}
+
+// プレースホルダー用カードビュー（ローディング時に表示）.
+private struct CardPlaceholderView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Rectangle()
+                .fill(Color.gray.opacity(0.3))
+                .aspectRatio(2/3, contentMode: .fit)
+                .cornerRadius(6)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 10)
+                
+                HStack {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.gray.opacity(0.25))
+                        .frame(width: 40, height: 8)
+                    
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.gray.opacity(0.25))
+                        .frame(width: 40, height: 8)
+                }
+            }
+            .padding(.horizontal, 4)
+            .padding(.bottom, 4)
+        }
+        .background(Color(.systemBackground))
+        .cornerRadius(8)
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
+// シマーアニメーション用モディファイア.
+private struct ShimmerModifier: ViewModifier {
+    @State private var phase: CGFloat = -1
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.white.opacity(0.0),
+                        Color.white.opacity(0.4),
+                        Color.white.opacity(0.0)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .scaleEffect(3)
+                .offset(x: phase * 200, y: phase * 200)
+                .blendMode(.plusLighter)
+            )
+            .mask(content)
+            .onAppear {
+                withAnimation(
+                    Animation.linear(duration: 1.2)
+                        .repeatForever(autoreverses: false)
+                ) {
+                    phase = 1.5
+                }
+            }
+    }
+}
+
+private extension View {
+    // シマーアニメーションを適用.
+    func shimmer() -> some View {
+        self.modifier(ShimmerModifier())
     }
 }
 
