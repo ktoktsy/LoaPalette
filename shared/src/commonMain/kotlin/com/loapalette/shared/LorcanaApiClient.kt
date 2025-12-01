@@ -61,3 +61,4 @@ class LorcanaApiClient(private val httpClient: HttpClient) {
 // HttpClientファクトリー
 expect fun createHttpClient(): HttpClient
 
+
