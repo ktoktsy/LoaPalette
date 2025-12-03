@@ -13,6 +13,23 @@ struct CardSearchView: View {
     @State private var timer: Timer?
     @State private var isFilterSheetPresented = false
 
+    // フィルター状態を保持.
+    @State private var selectedFilters: Set<CardSearchFilterAccessoryView.Filter> = []
+    @State private var filterNameQuery: String = ""
+    @State private var filterMinCost: Int = 0
+    @State private var filterMaxCost: Int = 10
+    @State private var selectedTypes: Set<CardSearchFilterAccessoryView.CardType> = []
+    @State private var selectedRarities: Set<CardSearchFilterAccessoryView.Rarity> = []
+    @State private var inkableFilter: CardSearchFilterAccessoryView.InkableFilter = .any
+    @State private var filterMinStrength: Int = 0
+    @State private var filterMaxStrength: Int = 20
+    @State private var filterMinWillpower: Int = 0
+    @State private var filterMaxWillpower: Int = 20
+    @State private var filterMinLore: Int = 0
+    @State private var filterMaxLore: Int = 5
+    @State private var filterSetName: String = ""
+    @State private var filterArtist: String = ""
+
     private let gridColumns: [GridItem] = [
         GridItem(.flexible(), spacing: 8),
         GridItem(.flexible(), spacing: 8),
@@ -25,7 +42,13 @@ struct CardSearchView: View {
                 .onChange(of: searchText) { oldValue, newValue in
                     timer?.invalidate()
                     timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
-                        viewModel.search(query: newValue)
+                        let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if trimmed.isEmpty {
+                            viewModel.search(query: "")
+                        } else {
+                            // ユーザー入力は name~text としてLorcana APIに渡す.
+                            viewModel.search(query: "name~\(trimmed)")
+                        }
                     }
                 }
                 .onAppear {
@@ -60,12 +83,28 @@ struct CardSearchView: View {
             .padding(.bottom, 8)
         }
         .sheet(isPresented: $isFilterSheetPresented) {
-            CardSearchFilterAccessoryView { keyword in
-                // フィルター選択時は検索テキストを更新して検索実行.
-                searchText = keyword
-                viewModel.search(query: keyword)
-                isFilterSheetPresented = false
-            }
+            CardSearchFilterAccessoryView(
+                selectedFilters: $selectedFilters,
+                nameQuery: $filterNameQuery,
+                minCost: $filterMinCost,
+                maxCost: $filterMaxCost,
+                selectedTypes: $selectedTypes,
+                selectedRarities: $selectedRarities,
+                inkableFilter: $inkableFilter,
+                minStrength: $filterMinStrength,
+                maxStrength: $filterMaxStrength,
+                minWillpower: $filterMinWillpower,
+                maxWillpower: $filterMaxWillpower,
+                minLore: $filterMinLore,
+                maxLore: $filterMaxLore,
+                setName: $filterSetName,
+                artist: $filterArtist,
+                onSelect: { searchClause in
+                    // 詳細検索時は検索バーのテキストは変更せず、searchパラメータだけ更新.
+                    viewModel.search(query: searchClause)
+                    isFilterSheetPresented = false
+                }
+            )
             .modifier(FilterSheetDetentsModifier())
         }
     }
@@ -115,7 +154,12 @@ struct CardSearchView: View {
                 if searchText.isEmpty {
                     viewModel.loadAllCards()
                 } else {
-                    viewModel.search(query: searchText)
+                    let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if trimmed.isEmpty {
+                        viewModel.loadAllCards()
+                    } else {
+                        viewModel.search(query: "name~\(trimmed)")
+                    }
                 }
             }
         }

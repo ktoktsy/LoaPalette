@@ -117,7 +117,9 @@ class RoaCounterViewModel {
     fun formatTime(time: Double): String {
         val minutes = (time.toInt() / 60)
         val seconds = (time.toInt() % 60)
-        return String.format("%02d:%02d", minutes, seconds)
+        val minStr = minutes.toString().padStart(2, '0')
+        val secStr = seconds.toString().padStart(2, '0')
+        return "$minStr:$secStr"
     }
     
     fun cleanup() {

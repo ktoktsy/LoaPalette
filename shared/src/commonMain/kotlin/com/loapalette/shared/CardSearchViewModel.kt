@@ -42,13 +42,14 @@ class CardSearchViewModel {
     private var searchJob: kotlinx.coroutines.Job? = null
     
     // 検索実行
+    // API仕様: https://lorcana-api.com/docs/cards/parameters/search-parameter
     fun search(query: String) {
         _searchQuery.value = query
         searchJob?.cancel()
         
         if (query.isBlank()) {
-            _cards.value = emptyList()
-            _searchState.value = SearchState.IDLE
+            // クエリが空のときは全件取得にフォールバック.
+            loadAllCards()
             return
         }
         
@@ -59,6 +60,8 @@ class CardSearchViewModel {
             // デバウンス処理（500ms待機）
             delay(500)
             
+            // APIのsearchパラメータを使用してサーバー側でフィルタリング.
+            // クエリは既にAPI仕様に従った形式（例: name~text;cost>=3;color~amber）で構築されている.
             val result = apiClient.searchCards(searchQuery = query)
             result.fold(
                 onSuccess = { response ->
