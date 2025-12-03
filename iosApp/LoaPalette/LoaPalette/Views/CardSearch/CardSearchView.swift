@@ -7,11 +7,28 @@
 
 import SwiftUI
 
+#if canImport(UIKit)
+    import UIKit
+#endif
+
 struct CardSearchView: View {
     @StateObject private var viewModel = CardSearchViewModel()
+    @StateObject private var deckListViewModel = DeckListViewModel()
     @State private var searchText = ""
     @State private var timer: Timer?
     @State private var isFilterSheetPresented = false
+    @State private var selectedCards: Set<String> = []
+    @State private var isDeckSelectionPresented = false
+    @Environment(\.dismiss) private var dismiss
+
+    // シート表示かどうか（デッキ詳細から遷移した場合など）
+    var isPresentedAsSheet: Bool = false
+
+    // 追加先のデッキID（デッキ詳細から遷移した場合に設定）
+    var targetDeckId: String? = nil
+
+    // 初期インク色フィルター（デッキ詳細から遷移した場合に設定）
+    var initialInkFilters: [CardSearchFilterAccessoryView.Filter] = []
 
     // フィルター状態を保持.
     @State private var selectedFilters: Set<CardSearchFilterAccessoryView.Filter> = []
@@ -38,21 +55,63 @@ struct CardSearchView: View {
     var body: some View {
         NavigationStack {
             content
-                .searchable(text: $searchText, prompt: "カード名で検索")
+                .searchable(text: $searchText, prompt: String(localized: "カード名を入力して検索"))
+                .toolbar {
+                    if isPresentedAsSheet {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                    }
+                }
                 .onChange(of: searchText) { oldValue, newValue in
                     timer?.invalidate()
                     timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                         let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
                         if trimmed.isEmpty {
-                            viewModel.search(query: "")
+                            // 検索テキストが空の場合、インク色フィルターがあればそれで検索
+                            if !selectedFilters.isEmpty {
+                                let colorClauses = Array(selectedFilters).map { $0.searchClause }
+                                let searchQuery =
+                                    colorClauses.count == 1
+                                    ? colorClauses[0]
+                                    : "(\(colorClauses.joined(separator: ";|"));)"
+                                viewModel.search(query: searchQuery)
+                            } else {
+                                viewModel.search(query: "")
+                            }
                         } else {
-                            // ユーザー入力は name~text としてLorcana APIに渡す.
-                            viewModel.search(query: "name~\(trimmed)")
+                            // 検索テキストがある場合、インク色フィルターと組み合わせる
+                            var clauses: [String] = ["name~\(trimmed)"]
+                            if !selectedFilters.isEmpty {
+                                let colorClauses = Array(selectedFilters).map { $0.searchClause }
+                                if colorClauses.count == 1 {
+                                    clauses.append(colorClauses[0])
+                                } else if colorClauses.count > 1 {
+                                    clauses.append("(\(colorClauses.joined(separator: ";|"));)")
+                                }
+                            }
+                            viewModel.search(query: clauses.joined(separator: ";"))
                         }
                     }
                 }
                 .onAppear {
-                    if viewModel.cards.isEmpty {
+                    // デッキ詳細から遷移した場合、インク色で自動的に絞り込む
+                    if !initialInkFilters.isEmpty {
+                        selectedFilters = Set(initialInkFilters)
+
+                        // インク色で検索を実行
+                        let colorClauses = initialInkFilters.map { $0.searchClause }
+                        let searchQuery =
+                            colorClauses.count == 1
+                            ? colorClauses[0]
+                            : "(\(colorClauses.joined(separator: ";|"));)"
+                        viewModel.search(query: searchQuery)
+                    } else if viewModel.cards.isEmpty {
+                        // インク色フィルターがない場合のみ、全カードを読み込む
                         viewModel.loadAllCards()
                     }
                 }
@@ -62,25 +121,73 @@ struct CardSearchView: View {
                 }
         }
         .safeAreaInset(edge: .bottom) {
-            Button {
-                isFilterSheetPresented = true
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
-                    Text("詳細に検索")
-                        .fontWeight(.semibold)
+            VStack(spacing: 8) {
+                if !selectedCards.isEmpty {
+                    HStack(spacing: 12) {
+                        Button {
+                            selectedCards.removeAll()
+                        } label: {
+                            Text(String(localized: "選択解除"))
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.secondary)
+                        }
+
+                        Spacer()
+
+                        Text(String(format: String(localized: "%lld枚選択中"), selectedCards.count))
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+
+                        Spacer()
+
+                        Button {
+                            if let targetDeckId = targetDeckId {
+                                // デッキ詳細から遷移した場合、直接そのデッキに追加
+                                addCardsToTargetDeck(deckId: targetDeckId)
+                            } else {
+                                // 通常の場合はデッキ選択画面を表示
+                                isDeckSelectionPresented = true
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus.circle.fill")
+                                Text(String(localized: "デッキに追加"))
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.accentColor)
+                            .clipShape(Capsule())
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial)
                 }
-                .font(.subheadline)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.ultraThinMaterial.opacity(0.6))
-                .clipShape(Capsule())
-                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
-                .frame(maxWidth: .infinity)
+
+                Button {
+                    isFilterSheetPresented = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                        Text(String(localized: "詳細検索"))
+                            .fontWeight(.semibold)
+                    }
+                    .font(.subheadline)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(.ultraThinMaterial.opacity(0.6))
+                    .clipShape(Capsule())
+                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 8)
             }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 8)
         }
         .sheet(isPresented: $isFilterSheetPresented) {
             CardSearchFilterAccessoryView(
@@ -107,7 +214,54 @@ struct CardSearchView: View {
             )
             .modifier(FilterSheetDetentsModifier())
         }
+        .sheet(isPresented: $isDeckSelectionPresented) {
+            DeckSelectionView(
+                selectedCardIds: selectedCards,
+                cards: viewModel.cards,
+                deckListViewModel: deckListViewModel,
+                onComplete: {
+                    selectedCards.removeAll()
+                    isDeckSelectionPresented = false
+                }
+            )
+        }
     }
+
+    // デッキ詳細から遷移した場合、直接そのデッキにカードを追加
+    private func addCardsToTargetDeck(deckId: String) {
+        let selectedCardsArray = filteredCards.filter { selectedCards.contains($0.id) }
+        for card in selectedCardsArray {
+            deckListViewModel.addCardToDeck(deckId, card: card, count: 1)
+        }
+        selectedCards.removeAll()
+
+        // ハプティックフィードバック
+        #if os(iOS)
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+        #endif
+    }
+    // フィルタリングされたカードリスト（2色設定時、その2色以外を含むカードを除外）
+    private var filteredCards: [LorcanaCard] {
+        // 2色設定されている場合のみフィルタリング
+        let activeFilters = !initialInkFilters.isEmpty ? initialInkFilters : Array(selectedFilters)
+        guard activeFilters.count == 2 else {
+            return viewModel.cards
+        }
+
+        let allowedColors = Set(activeFilters.map { $0.rawValue })
+
+        return viewModel.cards.filter { card in
+            guard let colorString = card.color else { return false }
+            // カンマ区切りの色文字列を解析
+            let cardColors = colorString.split(separator: ",").map {
+                $0.trimmingCharacters(in: .whitespaces)
+            }
+            // カードのすべての色が、選択された2色のいずれかである必要がある
+            return Set(cardColors).isSubset(of: allowedColors)
+        }
+    }
+
     // 状態ごとのコンテンツ切り出し.
     @ViewBuilder
     private var content: some View {
@@ -121,7 +275,7 @@ struct CardSearchView: View {
                 } else {
                     loadingPlaceholderGrid
                 }
-            case .idle where viewModel.cards.isEmpty:
+            case .idle where filteredCards.isEmpty:
                 emptyStateView
             default:
                 cardsGrid
@@ -150,7 +304,7 @@ struct CardSearchView: View {
                 .foregroundColor(.red)
             Text(message)
                 .foregroundColor(.secondary)
-            Button("再試行") {
+            Button(String(localized: "再試行")) {
                 if searchText.isEmpty {
                     viewModel.loadAllCards()
                 } else {
@@ -172,7 +326,7 @@ struct CardSearchView: View {
             Image(systemName: "magnifyingglass")
                 .font(.largeTitle)
                 .foregroundColor(.secondary)
-            Text("カード名を検索してください")
+            Text(String(localized: "カード名を入力して検索"))
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -182,8 +336,18 @@ struct CardSearchView: View {
     private var cardsGrid: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: gridColumns, spacing: 16) {
-                ForEach(viewModel.cards) { card in
-                    CardItemView(card: card)
+                ForEach(filteredCards) { card in
+                    CardItemView(
+                        card: card,
+                        isSelected: selectedCards.contains(card.id),
+                        onTap: {
+                            if selectedCards.contains(card.id) {
+                                selectedCards.remove(card.id)
+                            } else {
+                                selectedCards.insert(card.id)
+                            }
+                        }
+                    )
                 }
             }
             .padding()
@@ -193,23 +357,34 @@ struct CardSearchView: View {
 
 struct CardItemView: View {
     let card: LorcanaCard
+    var isSelected: Bool = false
+    var onTap: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let imageUrl = card.imageUrl, let url = URL(string: imageUrl) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } placeholder: {
+            ZStack(alignment: .topTrailing) {
+                if let imageUrl = card.imageUrl, let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    } placeholder: {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .aspectRatio(2 / 3, contentMode: .fit)
+                    }
+                } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
                         .aspectRatio(2 / 3, contentMode: .fit)
                 }
-            } else {
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-                    .aspectRatio(2 / 3, contentMode: .fit)
+
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.blue)
+                        .background(Color.white.clipShape(Circle()))
+                        .padding(4)
+                }
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -238,7 +413,14 @@ struct CardItemView: View {
         }
         .background(Color(.systemBackground))
         .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+        )
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .onTapGesture {
+            onTap?()
+        }
     }
 }
 
