@@ -27,7 +27,7 @@ struct CardSearchView: View {
     // 追加先のデッキID（デッキ詳細から遷移した場合に設定）
     var targetDeckId: String? = nil
 
-    // 初期インク色フィルター（デッキ詳細から遷移した場合に設定）
+    // 初期インクフィルター（デッキ詳細から遷移した場合に設定）
     var initialInkFilters: [CardSearchFilterAccessoryView.Filter] = []
 
     // フィルター状態を保持.
@@ -72,7 +72,7 @@ struct CardSearchView: View {
                     timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                         let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
                         if trimmed.isEmpty {
-                            // 検索テキストが空の場合、インク色フィルターがあればそれで検索
+                            // 検索テキストが空の場合、インクフィルターがあればそれで検索
                             if !selectedFilters.isEmpty {
                                 let colorClauses = Array(selectedFilters).map { $0.searchClause }
                                 let searchQuery =
@@ -84,7 +84,7 @@ struct CardSearchView: View {
                                 viewModel.search(query: "")
                             }
                         } else {
-                            // 検索テキストがある場合、インク色フィルターと組み合わせる
+                            // 検索テキストがある場合、インクフィルターと組み合わせる
                             var clauses: [String] = ["name~\(trimmed)"]
                             if !selectedFilters.isEmpty {
                                 let colorClauses = Array(selectedFilters).map { $0.searchClause }
@@ -99,11 +99,11 @@ struct CardSearchView: View {
                     }
                 }
                 .onAppear {
-                    // デッキ詳細から遷移した場合、インク色で自動的に絞り込む
+                    // デッキ詳細から遷移した場合、インクで自動的に絞り込む
                     if !initialInkFilters.isEmpty {
                         selectedFilters = Set(initialInkFilters)
 
-                        // インク色で検索を実行
+                        // インクで検索を実行
                         let colorClauses = initialInkFilters.map { $0.searchClause }
                         let searchQuery =
                             colorClauses.count == 1
@@ -111,7 +111,7 @@ struct CardSearchView: View {
                             : "(\(colorClauses.joined(separator: ";|"));)"
                         viewModel.search(query: searchQuery)
                     } else if viewModel.cards.isEmpty {
-                        // インク色フィルターがない場合のみ、全カードを読み込む
+                        // インクフィルターがない場合のみ、全カードを読み込む
                         viewModel.loadAllCards()
                     }
                 }

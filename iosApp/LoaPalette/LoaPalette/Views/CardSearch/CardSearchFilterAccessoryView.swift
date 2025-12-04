@@ -211,7 +211,7 @@ struct CardSearchFilterAccessoryView: View {
         }
 
         // Lorcana API searchパラメータ用クエリ文字列.
-        // インク色は color~amethyst のように部分一致指定する（APIレスポンスは "Amber, Steel" のような複数色カンマ区切り）.
+        // インクは color~amethyst のように部分一致指定する（APIレスポンスは "Amber, Steel" のような複数色カンマ区切り）.
         // 複数色は (color~amber;|color~steel;) のようにOR連結.
         // 参考: https://lorcana-api.com/docs/cards/parameters/search-parameter
         var searchClause: String {

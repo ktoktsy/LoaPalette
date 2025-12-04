@@ -16,7 +16,7 @@ struct DeckDetailView: View {
     @State private var isEditMode = false
     @State private var editedDeckName: String = ""
     @State private var editedInkColors: Set<Ink> = []
-    @State private var previousInkColors: Set<Ink> = []  // 以前のインク色の組み合わせを追跡
+    @State private var previousInkColors: Set<Ink> = []  // 以前のインクの組み合わせを追跡
     @State private var isDeleteAlertPresented = false
     @State private var displayMode: CardDisplayMode = .list
     @State private var isCardSearchPresented = false
@@ -158,7 +158,7 @@ struct DeckDetailView: View {
                     Text(String(localized: "デッキ名"))
                         .font(.subheadline)
                         .foregroundColor(.primary)
-                    TextField(String(localized: "デッキ名"), text: $editedDeckName)
+                    TextField(String(localized: "未入力の場合はインク名になります"), text: $editedDeckName)
                         .textFieldStyle(.roundedBorder)
                         .onChange(of: editedInkColors) { oldValue, newValue in
                             // インク色が変更されたら、名前が空または自動生成された名前の場合は更新
@@ -177,7 +177,7 @@ struct DeckDetailView: View {
 
                 // インク色選択
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(String(localized: "インク色（最大2色）"))
+                    Text(String(localized: "インク（最大2色）"))
                         .font(.subheadline)
                         .foregroundColor(.primary)
 
@@ -191,10 +191,6 @@ struct DeckDetailView: View {
                     .padding(.top, 2)
                 }
             } else {
-                Text(deck.name)
-                    .font(.title2)
-                    .fontWeight(.bold)
-
                 // インク色表示
                 if !deck.inkColors.isEmpty {
                     HStack(spacing: 8) {
