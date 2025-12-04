@@ -18,34 +18,55 @@ struct DeckListView: View {
 
     var body: some View {
         NavigationStack {
-            content
-                .navigationTitle(String(localized: "デッキリスト"))
-                .onAppear {
-                    // 画面表示前にJSONからデッキを読み込む
-                    viewModel.loadDecks()
-                }
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            isNewDeckSheetPresented = true
-                        } label: {
-                            Image(systemName: "plus")
+            ZStack {
+                content
+                    .navigationTitle(String(localized: "デッキリスト"))
+                    .onAppear {
+                        // 画面表示前にJSONからデッキを読み込む
+                        viewModel.loadDecks()
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                isNewDeckSheetPresented = true
+                            } label: {
+                                Image(systemName: "plus")
+                            }
                         }
                     }
-                }
-                .sheet(isPresented: $isDeckDetailPresented) {
-                    DeckDetailView(
-                        deckId: selectedDeckId ?? "",
-                        viewModel: viewModel,
-                        onDismiss: {
-                            selectedDeckId = nil
-                            isDeckDetailPresented = false
+                    .sheet(isPresented: $isDeckDetailPresented) {
+                        DeckDetailView(
+                            deckId: selectedDeckId ?? "",
+                            viewModel: viewModel,
+                            onDismiss: {
+                                selectedDeckId = nil
+                                isDeckDetailPresented = false
+                            }
+                        )
+                    }
+                    .sheet(isPresented: $isNewDeckSheetPresented) {
+                        newDeckSheet
+                    }
+
+                // ロード中または保存中のプログレス表示
+                if viewModel.isLoading || viewModel.isSaving {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                        .overlay {
+                            VStack(spacing: 16) {
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                                    .tint(.white)
+                                Text(viewModel.isLoading ? String(localized: "読み込み中...") : String(localized: "保存中..."))
+                                    .foregroundColor(.white)
+                                    .font(.subheadline)
+                            }
+                            .padding(24)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(16)
                         }
-                    )
                 }
-                .sheet(isPresented: $isNewDeckSheetPresented) {
-                    newDeckSheet
-                }
+            }
         }
     }
 

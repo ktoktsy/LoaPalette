@@ -15,6 +15,8 @@ import SwiftUI
 @MainActor
 class DeckListViewModel: ObservableObject {
     @Published var decks: [Deck] = []
+    @Published var isLoading: Bool = false
+    @Published var isSaving: Bool = false
 
     private let fileName = "decks.json"
     private var fileURL: URL {
@@ -23,46 +25,82 @@ class DeckListViewModel: ObservableObject {
         return documentsPath.appendingPathComponent(fileName)
     }
 
+    private var loadTask: Task<Void, Never>?
+    private var saveTask: Task<Void, Never>?
+
     init() {
         loadDecks()
     }
 
-    // JSONファイルからデッキを読み込む
+    // JSONファイルからデッキを読み込む（非同期）
     func loadDecks() {
-        guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            decks = []
-            return
-        }
+        loadTask?.cancel()
+        isLoading = true
 
-        do {
-            let data = try Data(contentsOf: fileURL)
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            let loadedDecks = try decoder.decode([Deck].self, from: data)
-            decks = loadedDecks
-            print("デッキの読み込み成功: \(decks.count)個のデッキを読み込みました")
-        } catch {
-            print("デッキの読み込みに失敗しました: \(error.localizedDescription)")
-            if let decodingError = error as? DecodingError {
-                print("デコードエラーの詳細: \(decodingError)")
+        loadTask = Task { @MainActor in
+            defer { isLoading = false }
+
+            guard FileManager.default.fileExists(atPath: fileURL.path) else {
+                decks = []
+                return
             }
-            decks = []
+
+            do {
+                let url = fileURL
+                // ファイル読み込みをバックグラウンドスレッドで実行
+                let data = try await Task.detached(priority: .userInitiated) {
+                    try Data(contentsOf: url)
+                }.value
+
+                // デコード処理もバックグラウンドスレッドで実行
+                let loadedDecks: [Deck] = try await Task.detached(priority: .userInitiated) {
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .iso8601
+                    return try decoder.decode([Deck].self, from: data)
+                }.value
+
+                decks = loadedDecks
+                print("デッキの読み込み成功: \(decks.count)個のデッキを読み込みました")
+            } catch {
+                print("デッキの読み込みに失敗しました: \(error.localizedDescription)")
+                if let decodingError = error as? DecodingError {
+                    print("デコードエラーの詳細: \(decodingError)")
+                }
+                decks = []
+            }
         }
     }
 
-    // JSONファイルにデッキを保存
+    // JSONファイルにデッキを保存（非同期）
     func saveDecks() {
-        do {
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            let data = try encoder.encode(decks)
-            try data.write(to: fileURL, options: .atomic)
-            print("デッキの保存成功: \(decks.count)個のデッキを保存しました（\(fileURL.path)）")
-        } catch {
-            print("デッキの保存に失敗しました: \(error.localizedDescription)")
-            if let encodingError = error as? EncodingError {
-                print("エンコードエラーの詳細: \(encodingError)")
+        saveTask?.cancel()
+        isSaving = true
+
+        saveTask = Task { @MainActor in
+            defer { isSaving = false }
+
+            do {
+                let currentDecks = decks
+                let url = fileURL
+                // エンコード処理をバックグラウンドスレッドで実行
+                let data = try await Task.detached(priority: .userInitiated) {
+                    let encoder = JSONEncoder()
+                    encoder.dateEncodingStrategy = .iso8601
+                    encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+                    return try encoder.encode(currentDecks)
+                }.value
+
+                // ファイル書き込みをバックグラウンドスレッドで実行
+                try await Task.detached(priority: .userInitiated) {
+                    try data.write(to: url, options: Data.WritingOptions.atomic)
+                }.value
+
+                print("デッキの保存成功: \(decks.count)個のデッキを保存しました（\(fileURL.path)）")
+            } catch {
+                print("デッキの保存に失敗しました: \(error.localizedDescription)")
+                if let encodingError = error as? EncodingError {
+                    print("エンコードエラーの詳細: \(encodingError)")
+                }
             }
         }
     }
@@ -134,5 +172,10 @@ class DeckListViewModel: ObservableObject {
             decks[index].updatedAt = Date()
             saveDecks()
         }
+    }
+
+    deinit {
+        loadTask?.cancel()
+        saveTask?.cancel()
     }
 }

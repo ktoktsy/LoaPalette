@@ -265,20 +265,41 @@ struct CardSearchView: View {
     // 状態ごとのコンテンツ切り出し.
     @ViewBuilder
     private var content: some View {
-        VStack {
-            switch viewModel.searchState {
-            case .loading:
-                loadingPlaceholderGrid
-            case .error:
-                if let errorMessage = viewModel.errorMessage {
-                    errorView(message: errorMessage)
-                } else {
+        ZStack {
+            VStack {
+                switch viewModel.searchState {
+                case .loading:
                     loadingPlaceholderGrid
+                case .error:
+                    if let errorMessage = viewModel.errorMessage {
+                        errorView(message: errorMessage)
+                    } else {
+                        loadingPlaceholderGrid
+                    }
+                case .idle where filteredCards.isEmpty:
+                    emptyStateView
+                default:
+                    cardsGrid
                 }
-            case .idle where filteredCards.isEmpty:
-                emptyStateView
-            default:
-                cardsGrid
+            }
+
+            // ロード中のプログレスインジケーター（オーバーレイ）
+            if viewModel.searchState == .loading {
+                Color.black.opacity(0.2)
+                    .ignoresSafeArea()
+                    .overlay {
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .tint(.white)
+                            Text(String(localized: "検索中..."))
+                                .foregroundColor(.white)
+                                .font(.subheadline)
+                        }
+                        .padding(24)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(16)
+                    }
             }
         }
     }
