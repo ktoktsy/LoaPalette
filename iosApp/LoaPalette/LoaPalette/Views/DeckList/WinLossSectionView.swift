@@ -39,7 +39,6 @@ struct WinLossSectionView: View {
                     isAddMatchRecordPresented = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.accentColor)
                 }
             }
             
@@ -141,10 +140,10 @@ struct WinLossSectionView: View {
                             Image(systemName: "chevron.down")
                                 .font(.caption)
                         }
-                        .foregroundColor(.accentColor)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                     }
+                    .buttonStyle(.bordered)
                     .padding(.top, 4)
                 }
                 }

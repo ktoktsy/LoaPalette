@@ -278,12 +278,10 @@ struct DeckDetailView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
-                    .foregroundColor(.accentColor)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
-                    .background(Color.accentColor.opacity(0.1))
-                    .cornerRadius(8)
                 }
+                .buttonStyle(.bordered)
                 .padding(.top, 4)
             }
         }
