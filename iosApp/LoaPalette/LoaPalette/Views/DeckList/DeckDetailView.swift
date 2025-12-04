@@ -20,6 +20,11 @@ struct DeckDetailView: View {
     @State private var isDeleteAlertPresented = false
     @State private var displayMode: CardDisplayMode = .list
     @State private var isCardSearchPresented = false
+    @State private var editedMemo: String = ""
+    @State private var isAddMatchRecordPresented = false
+    @State private var isMatchRecordsFullScreenPresented = false  // 試合記録フルスクリーン表示
+    @State private var isWinLossSectionExpanded = false  // 勝敗記録セクションの展開状態（デフォルト: 閉じる）
+    @State private var isMemoSectionExpanded = true  // メモセクションの展開状態（デフォルト: 開く）
 
     // カード表示モード
     enum CardDisplayMode: Equatable {
@@ -43,9 +48,21 @@ struct DeckDetailView: View {
             Group {
                 if let deck = deck {
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 20) {
+                        VStack(alignment: .leading, spacing: 5) {
                             // デッキ情報セクション
                             deckInfoSection(deck: deck)
+
+                            // 勝敗記録セクション
+                            WinLossSectionView(
+                                deck: deck,
+                                viewModel: viewModel,
+                                isExpanded: $isWinLossSectionExpanded,
+                                isAddMatchRecordPresented: $isAddMatchRecordPresented,
+                                isMatchRecordsFullScreenPresented: $isMatchRecordsFullScreenPresented
+                            )
+
+                            // メモセクション
+                            memoSection(deck: deck)
 
                             // カードリストセクション
                             cardsSection(deck: deck)
@@ -106,6 +123,7 @@ struct DeckDetailView: View {
                                 editedDeckName = deck.name
                                 editedInkColors = Set(deck.inkColors)
                                 previousInkColors = Set(deck.inkColors)
+                                editedMemo = deck.memo
                             }
                             isEditMode = true
                         }
@@ -145,6 +163,28 @@ struct DeckDetailView: View {
                     )
                 } else {
                     CardSearchView(isPresentedAsSheet: true)
+                }
+            }
+            .sheet(isPresented: $isAddMatchRecordPresented) {
+                if let deck = deck {
+                    AddMatchRecordView(
+                        deckId: deck.id,
+                        viewModel: viewModel,
+                        onDismiss: {
+                            isAddMatchRecordPresented = false
+                        }
+                    )
+                }
+            }
+            .fullScreenCover(isPresented: $isMatchRecordsFullScreenPresented) {
+                if let deck = deck {
+                    MatchRecordsFullScreenView(
+                        deckId: deck.id,
+                        viewModel: viewModel,
+                        onDismiss: {
+                            isMatchRecordsFullScreenPresented = false
+                        }
+                    )
                 }
             }
         }
@@ -331,14 +371,10 @@ struct DeckDetailView: View {
         let trimmedName = editedDeckName.trimmingCharacters(in: .whitespacesAndNewlines)
         let inkColors = Array(editedInkColors).sorted { $0.rawValue < $1.rawValue }
 
-        // 名前とインク色が変更されていない場合は何もしない
-        guard trimmedName != deck.name || inkColors != deck.inkColors else {
-            return
-        }
-
         var updatedDeck = deck
         updatedDeck.name = trimmedName
         updatedDeck.inkColors = inkColors
+        updatedDeck.memo = editedMemo
 
         // 名前が空でインク色が選択されている場合は、インク色からデッキ名を生成
         if updatedDeck.name.isEmpty && !updatedDeck.inkColors.isEmpty {
@@ -444,7 +480,61 @@ struct DeckDetailView: View {
         formatter.timeStyle = .short
         return formatter.string(from: date)
     }
+
+
+    // メモセクション
+    private func memoSection(deck: Deck) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation {
+                    isMemoSectionExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: isMemoSectionExpanded ? "chevron.down" : "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(String(localized: "メモ"))
+                        .font(.headline)
+                }
+            }
+            .buttonStyle(.plain)
+            
+            if isMemoSectionExpanded {
+                if isEditMode {
+                    TextEditor(text: $editedMemo)
+                        .frame(minHeight: 100)
+                        .padding(8)
+                        .background(Color(.systemBackground))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                } else {
+                    if deck.memo.isEmpty {
+                        Text(String(localized: "メモがありません"))
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 8)
+                    } else {
+                        Text(deck.memo)
+                            .font(.subheadline)
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 8)
+                    }
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemGroupedBackground))
+        .cornerRadius(12)
+    }
 }
+
 
 // 情報アイテムビュー
 struct InfoItem: View {

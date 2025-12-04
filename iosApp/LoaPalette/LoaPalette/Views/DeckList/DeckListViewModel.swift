@@ -110,4 +110,29 @@ class DeckListViewModel: ObservableObject {
             saveDecks()
         }
     }
+
+    // 試合記録を追加
+    func addMatchRecord(_ deckId: String, record: MatchRecord) {
+        if let index = decks.firstIndex(where: { $0.id == deckId }) {
+            decks[index].addMatchRecord(record)
+            saveDecks()
+        }
+    }
+
+    // 試合記録を削除
+    func removeMatchRecord(_ deckId: String, recordId: String) {
+        if let index = decks.firstIndex(where: { $0.id == deckId }) {
+            decks[index].removeMatchRecord(recordId)
+            saveDecks()
+        }
+    }
+
+    // デッキのメモを更新
+    func updateMemo(_ deckId: String, memo: String) {
+        if let index = decks.firstIndex(where: { $0.id == deckId }) {
+            decks[index].memo = memo
+            decks[index].updatedAt = Date()
+            saveDecks()
+        }
+    }
 }
