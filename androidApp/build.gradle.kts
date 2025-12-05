@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics.gradle)
 }
 
 kotlin {
@@ -23,6 +25,12 @@ kotlin {
                 implementation(libs.androidx.compose.material3)
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.androidx.lifecycle.runtime.compose)
+                
+                // Firebase
+                val firebaseBomVersion = libs.versions.firebaseBom.get()
+                implementation(platform("com.google.firebase:firebase-bom:$firebaseBomVersion"))
+                implementation("com.google.firebase:firebase-analytics-ktx")
+                implementation("com.google.firebase:firebase-crashlytics-ktx")
             }
         }
     }

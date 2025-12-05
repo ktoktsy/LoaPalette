@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "174507597836",
+    "project_id": "lorpallete-2746c",
+    "storage_bucket": "lorpallete-2746c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:174507597836:android:b8f9b54c2c43a14fde0e29",
+        "android_client_info": {
+          "package_name": "com.hocus.lorPallete"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRqfrZzVnhe2rezXhy81PpR6hX79CcI-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

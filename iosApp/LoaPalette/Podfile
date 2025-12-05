@@ -8,6 +8,10 @@ target 'LoaPalette' do
 
   # Pods for LoaPalette
   pod 'shared', :path => '../../shared'
+  
+  # Firebase
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Crashlytics'
 
 end
 
