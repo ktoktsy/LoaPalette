@@ -25,12 +25,12 @@ private enum SettingsItem: Identifiable {
 
 struct SettingsView: View {
     @State private var preloadedNativeAd: NativeAd?
-    
+
     private let items: [SettingsItem] = [
         .officialSite,
         .contact,
     ]
-    
+
     private let adUnitID = "ca-app-pub-3940256099942544/3986624511"
 
     var body: some View {
@@ -39,7 +39,7 @@ struct SettingsView: View {
                 // ネイティブアドバンス広告
                 Section {
                     NativeAdvancedAdView(adUnitID: adUnitID, preloadedNativeAd: preloadedNativeAd)
-                        .frame(minHeight: 200)
+                        .frame(minHeight: 250)
                         .frame(maxWidth: .infinity)
                 }
 
@@ -61,7 +61,7 @@ struct SettingsView: View {
             }
         }
     }
-    
+
     /// 広告を読み込む（キャッシュから取得、なければプリロード）
     private func loadAd() {
         // キャッシュから取得を試みる
@@ -69,13 +69,13 @@ struct SettingsView: View {
             preloadedNativeAd = cachedAd
             return
         }
-        
+
         // キャッシュにない場合はプリロードを開始
         AdManager.shared.preloadAd(adUnitID: adUnitID) { nativeAd in
             self.preloadedNativeAd = nativeAd
         }
     }
-    
+
     private func officialSite() -> some View {
         Button {
             AnalyticsManager.shared.logSettingsOfficialSiteClick()

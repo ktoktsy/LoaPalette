@@ -157,9 +157,13 @@ struct NativeAdvancedAdView: UIViewRepresentable {
                 let iconView = UIImageView(image: icon.image)
                 iconView.contentMode = .scaleAspectFit
                 iconView.translatesAutoresizingMaskIntoConstraints = false
+                // 高さ制約を優先度付きにして、制約競合を回避
+                let iconHeightConstraint = iconView.heightAnchor.constraint(equalToConstant: 50)
+                iconHeightConstraint.priority = .defaultHigh
                 NSLayoutConstraint.activate([
                     iconView.widthAnchor.constraint(equalToConstant: 50),
-                    iconView.heightAnchor.constraint(equalToConstant: 50)
+                    iconView.heightAnchor.constraint(lessThanOrEqualToConstant: 50),
+                    iconHeightConstraint
                 ])
                 adView.iconView = iconView
                 headerStackView.addArrangedSubview(iconView)
@@ -181,11 +185,13 @@ struct NativeAdvancedAdView: UIViewRepresentable {
             mediaView.translatesAutoresizingMaskIntoConstraints = false
             adView.mediaView = mediaView
             mainStackView.addArrangedSubview(mediaView)
-            // アスペクト比16:9を維持しつつ、最小高さを確保
+            // アスペクト比16:9を維持しつつ、最小高さを確保（優先度付きで柔軟に対応）
             let mediaHeightConstraint = mediaView.heightAnchor.constraint(equalTo: mediaView.widthAnchor, multiplier: 9.0/16.0)
             mediaHeightConstraint.priority = .defaultHigh
+            let mediaMinHeightConstraint = mediaView.heightAnchor.constraint(greaterThanOrEqualToConstant: 120)
+            mediaMinHeightConstraint.priority = .defaultHigh
             NSLayoutConstraint.activate([
-                mediaView.heightAnchor.constraint(greaterThanOrEqualToConstant: 120),
+                mediaMinHeightConstraint,
                 mediaView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor),
                 mediaHeightConstraint
             ])
