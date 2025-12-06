@@ -31,15 +31,26 @@ class RoaCounterViewModel {
     
     private var timerJob: Job? = null
     
+    // Analyticsコールバック
+    var onResetCounters: (() -> Unit)? = null
+    var onTimerStart: (() -> Unit)? = null
+    var onAddPerson: ((String) -> Unit)? = null
+    
     // MARK: - カウンター管理
     
     fun resetAllCounters() {
+        onResetCounters?.invoke()
         _counterPairs.value = _counterPairs.value.map { pair ->
             pair.copy(opponentPoint = 0, myPoint = 0)
         }
     }
     
     fun addCounterPair(position: AddPosition) {
+        val positionString = when (position) {
+            AddPosition.LEFT -> "LEFT"
+            AddPosition.RIGHT -> "RIGHT"
+        }
+        onAddPerson?.invoke(positionString)
         val newPair = CounterPair(isOriginalColor = false)
         val currentPairs = _counterPairs.value.toMutableList()
         when (position) {
@@ -80,6 +91,7 @@ class RoaCounterViewModel {
     fun startTimer() {
         if (_isTimerRunning.value) return
         
+        onTimerStart?.invoke()
         _isTimerRunning.value = true
         timerJob = viewModelScope.launch {
             while (_isTimerRunning.value) {

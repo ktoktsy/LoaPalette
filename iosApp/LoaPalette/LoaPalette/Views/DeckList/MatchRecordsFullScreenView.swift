@@ -110,8 +110,12 @@ struct MatchRecordsFullScreenView: View {
         HStack(spacing: 16) {
             // 勝利数
             Button {
+                let newFilterType: MatchFilterType = filterType.wrappedValue == .wins ? .all : .wins
+                if newFilterType == .wins {
+                    AnalyticsManager.shared.logMatchRecordFilterWins()
+                }
                 withAnimation {
-                    filterType.wrappedValue = filterType.wrappedValue == .wins ? .all : .wins
+                    filterType.wrappedValue = newFilterType
                 }
             } label: {
                 VStack(spacing: 2) {
@@ -140,8 +144,12 @@ struct MatchRecordsFullScreenView: View {
             
             // 敗北数
             Button {
+                let newFilterType: MatchFilterType = filterType.wrappedValue == .losses ? .all : .losses
+                if newFilterType == .losses {
+                    AnalyticsManager.shared.logMatchRecordFilterLosses()
+                }
                 withAnimation {
-                    filterType.wrappedValue = filterType.wrappedValue == .losses ? .all : .losses
+                    filterType.wrappedValue = newFilterType
                 }
             } label: {
                 VStack(spacing: 2) {

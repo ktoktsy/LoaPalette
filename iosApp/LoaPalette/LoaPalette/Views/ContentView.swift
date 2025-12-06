@@ -22,7 +22,7 @@ struct ContentView: View {
                 NewsView()
             }
 
-            Tab(String(localized: "設定"), systemImage: "gearshape.fill") {
+            Tab(String(localized: "その他"), systemImage: "gearshape.fill") {
                 SettingsView()
             }
             

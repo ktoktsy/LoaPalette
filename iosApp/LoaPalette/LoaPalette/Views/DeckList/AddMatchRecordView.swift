@@ -251,6 +251,27 @@ struct AddMatchRecordView: View {
             isWin: isWinValue,
             playedAt: playedAt
         )
+        
+        // デッキ名を取得
+        let deck = viewModel.decks.first { $0.id == deckId }
+        let deckName = deck?.name ?? ""
+        
+        // 相手のインク色を文字列配列に変換
+        let opponentInkColorStrings = inkColors.map { $0.rawValue }
+        
+        // 試合日時をISO8601形式の文字列に変換
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let playedAtString = formatter.string(from: playedAt)
+        
+        // イベント送信
+        AnalyticsManager.shared.logMatchRecordAddComplete(
+            isWin: isWinValue,
+            deckName: deckName,
+            opponentInkColors: opponentInkColorStrings,
+            playedAt: playedAtString
+        )
+        
         viewModel.addMatchRecord(deckId, record: record)
         onDismiss()
     }

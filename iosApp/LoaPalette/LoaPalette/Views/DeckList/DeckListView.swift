@@ -103,6 +103,7 @@ struct DeckListView: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         print("DeckListView - deck tapped: \(deck.id), name: \(deck.name)")
+                        AnalyticsManager.shared.logDeckSelect(deckName: deck.name)
                         selectedDeckId = deck.id
                         isDeckDetailPresented = true
                     }

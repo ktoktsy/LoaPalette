@@ -20,6 +20,7 @@ class RoaCounterViewModel: ObservableObject {
     private var updateTimer: Timer?
 
     func resetAllCounters() {
+        AnalyticsManager.shared.logRoaCounterReset()
         counterPairs = counterPairs.map { pair in
             CounterPair(
                 id: pair.id,
@@ -31,6 +32,8 @@ class RoaCounterViewModel: ObservableObject {
     }
 
     func addCounterPair(position: AddPosition) {
+        let positionString = position == .LEFT ? "LEFT" : "RIGHT"
+        AnalyticsManager.shared.logRoaCounterAddPerson(position: positionString)
         let newPair = CounterPair(isOriginalColor: false)
         var currentPairs = counterPairs
         switch position {
@@ -80,6 +83,7 @@ class RoaCounterViewModel: ObservableObject {
 
     private func startTimer() {
         if isTimerRunning { return }
+        AnalyticsManager.shared.logRoaCounterTimerStart()
         isTimerRunning = true
         updateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self else { return }

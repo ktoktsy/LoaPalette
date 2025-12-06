@@ -309,6 +309,10 @@ struct DeckDetailView: View {
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 100)
+                .onChange(of: displayMode) { oldValue, newValue in
+                    let modeString = newValue == .list ? "list" : "grid"
+                    AnalyticsManager.shared.logDeckCardDisplayModeChange(displayMode: modeString)
+                }
             }
 
             if deck.entries.isEmpty {

@@ -17,6 +17,7 @@ struct CardSearchView: View {
     @State private var searchText = ""
     @State private var timer: Timer?
     @State private var isFilterSheetPresented = false
+    @State private var hasLoggedSearchFieldTap = false
     @State private var selectedCards: Set<String> = []
     @State private var isDeckSelectionPresented = false
     @Environment(\.dismiss) private var dismiss
@@ -68,6 +69,11 @@ struct CardSearchView: View {
                     }
                 }
                 .onChange(of: searchText) { oldValue, newValue in
+                    // 検索欄が空から何か入力された時（タップして入力開始した時）にイベント送信
+                    if oldValue.isEmpty && !newValue.isEmpty && !hasLoggedSearchFieldTap {
+                        AnalyticsManager.shared.logCardSearchFieldTap()
+                        hasLoggedSearchFieldTap = true
+                    }
                     timer?.invalidate()
                     timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                         let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -99,6 +105,8 @@ struct CardSearchView: View {
                     }
                 }
                 .onAppear {
+                    // 検索欄タップフラグをリセット
+                    hasLoggedSearchFieldTap = false
                     // デッキ詳細から遷移した場合、インクで自動的に絞り込む
                     if !initialInkFilters.isEmpty {
                         selectedFilters = Set(initialInkFilters)
@@ -169,6 +177,7 @@ struct CardSearchView: View {
                 }
 
                 Button {
+                    AnalyticsManager.shared.logCardSearchDetailButtonClick()
                     isFilterSheetPresented = true
                 } label: {
                     HStack(spacing: 8) {
@@ -209,6 +218,94 @@ struct CardSearchView: View {
                 onSelect: { searchClause in
                     // 詳細検索時は検索バーのテキストは変更せず、searchパラメータだけ更新.
                     viewModel.search(query: searchClause)
+                    
+                    // デフォルト値を除いた検索パラメータを取得
+                    var parameters: [String: Any] = [:]
+                    
+                    // カード名
+                    let trimmedName = filterNameQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !trimmedName.isEmpty {
+                        parameters["name_query"] = trimmedName
+                    }
+                    
+                    // コスト範囲
+                    if filterMinCost != 0 || filterMaxCost != 10 {
+                        if filterMinCost != 0 {
+                            parameters["min_cost"] = filterMinCost
+                        }
+                        if filterMaxCost != 10 {
+                            parameters["max_cost"] = filterMaxCost
+                        }
+                    }
+                    
+                    // 攻撃力範囲
+                    if filterMinStrength != 0 || filterMaxStrength != 20 {
+                        if filterMinStrength != 0 {
+                            parameters["min_strength"] = filterMinStrength
+                        }
+                        if filterMaxStrength != 20 {
+                            parameters["max_strength"] = filterMaxStrength
+                        }
+                    }
+                    
+                    // 防御力範囲
+                    if filterMinWillpower != 0 || filterMaxWillpower != 20 {
+                        if filterMinWillpower != 0 {
+                            parameters["min_willpower"] = filterMinWillpower
+                        }
+                        if filterMaxWillpower != 20 {
+                            parameters["max_willpower"] = filterMaxWillpower
+                        }
+                    }
+                    
+                    // ロア範囲
+                    if filterMinLore != 0 || filterMaxLore != 5 {
+                        if filterMinLore != 0 {
+                            parameters["min_lore"] = filterMinLore
+                        }
+                        if filterMaxLore != 5 {
+                            parameters["max_lore"] = filterMaxLore
+                        }
+                    }
+                    
+                    // セット名
+                    let trimmedSetName = filterSetName.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !trimmedSetName.isEmpty {
+                        parameters["set_name"] = trimmedSetName
+                    }
+                    
+                    // イラストレーター
+                    let trimmedArtist = filterArtist.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !trimmedArtist.isEmpty {
+                        parameters["artist"] = trimmedArtist
+                    }
+                    
+                    // インク可能
+                    if inkableFilter != .any {
+                        parameters["inkable"] = inkableFilter.rawValue
+                    }
+                    
+                    // インクカラー
+                    if !selectedFilters.isEmpty {
+                        let inkColors = Array(selectedFilters).map { $0.rawValue }
+                        parameters["ink_colors"] = inkColors.joined(separator: ",")
+                    }
+                    
+                    // カードタイプ
+                    if !selectedTypes.isEmpty {
+                        let types = Array(selectedTypes).map { $0.rawValue }
+                        parameters["card_types"] = types.joined(separator: ",")
+                    }
+                    
+                    // レアリティ
+                    if !selectedRarities.isEmpty {
+                        let rarities = Array(selectedRarities).map { $0.rawValue }
+                        parameters["rarities"] = rarities.joined(separator: ",")
+                    }
+                    
+                    // イベント送信
+                    AnalyticsManager.shared.logCardSearchExecute(parameters: parameters)
+                    
                     isFilterSheetPresented = false
                 }
             )

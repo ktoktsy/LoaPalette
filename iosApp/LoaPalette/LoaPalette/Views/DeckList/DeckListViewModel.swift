@@ -107,6 +107,7 @@ class DeckListViewModel: ObservableObject {
 
     // デッキを追加
     func addDeck(_ deck: Deck) {
+        AnalyticsManager.shared.logDeckAdd()
         decks.append(deck)
         saveDecks()
     }

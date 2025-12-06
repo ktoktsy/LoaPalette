@@ -51,6 +51,12 @@ kotlin {
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.androidx.lifecycle.runtime.compose)
                 implementation(libs.ktor.client.android)
+                
+                // Firebase
+                val firebaseBomVersion = libs.versions.firebaseBom.get()
+                implementation(platform("com.google.firebase:firebase-bom:$firebaseBomVersion"))
+                implementation(libs.firebase.analytics)
+                implementation(libs.firebase.config)
             }
         }
 

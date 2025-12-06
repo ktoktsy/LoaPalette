@@ -31,6 +31,7 @@ kotlin {
                 implementation(platform("com.google.firebase:firebase-bom:$firebaseBomVersion"))
                 implementation("com.google.firebase:firebase-analytics-ktx")
                 implementation("com.google.firebase:firebase-crashlytics-ktx")
+                implementation(libs.firebase.config)
             }
         }
     }

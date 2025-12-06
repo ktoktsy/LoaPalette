@@ -36,6 +36,7 @@ struct WinLossSectionView: View {
                 Spacer()
 
                 Button {
+                    AnalyticsManager.shared.logMatchRecordAddButtonClick()
                     isAddMatchRecordPresented = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
@@ -132,6 +133,7 @@ struct WinLossSectionView: View {
                 // 表示拡張ボタン（2件以上ある場合のみ表示）
                 if sortedRecords.count > 2 {
                     Button {
+                        AnalyticsManager.shared.logDeckDetailMoreButtonClick()
                         isMatchRecordsFullScreenPresented = true
                     } label: {
                         HStack {
