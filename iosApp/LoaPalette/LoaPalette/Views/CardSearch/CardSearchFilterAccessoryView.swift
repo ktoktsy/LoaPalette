@@ -251,8 +251,7 @@ struct CardSearchFilterAccessoryView: View {
         case superRare = "Super Rare"
         case legendary = "Legendary"
         // TODO: APIにEnchantedレアリティが存在しないため、一時的にUIから非表示.
-        // APIに追加された場合はコメントアウトを解除して、allCasesのカスタム実装も削除.
-        // case enchanted = "Enchanted"
+        // APIに追加された場合はallCasesのカスタム実装も削除.
 
         var id: String { rawValue }
 
@@ -263,8 +262,6 @@ struct CardSearchFilterAccessoryView: View {
             case .rare: return String(localized: "レア")
             case .superRare: return String(localized: "スーパーレア")
             case .legendary: return String(localized: "レジェンダリー")
-            // TODO: EnchantedがAPIに追加されたらコメントアウトを解除.
-            // case .enchanted: return String(localized: "エンチャンテッド")
             }
         }
 

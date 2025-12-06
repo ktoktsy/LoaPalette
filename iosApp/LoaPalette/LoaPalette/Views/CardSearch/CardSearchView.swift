@@ -85,9 +85,13 @@ struct CardSearchView: View {
                                     colorClauses.count == 1
                                     ? colorClauses[0]
                                     : "(\(colorClauses.joined(separator: ";|"));)"
-                                viewModel.search(query: searchQuery)
+                                Task { @MainActor in
+                                    viewModel.search(query: searchQuery)
+                                }
                             } else {
-                                viewModel.search(query: "")
+                                Task { @MainActor in
+                                    viewModel.search(query: "")
+                                }
                             }
                         } else {
                             // 検索テキストがある場合、インクフィルターと組み合わせる
@@ -100,7 +104,9 @@ struct CardSearchView: View {
                                     clauses.append("(\(colorClauses.joined(separator: ";|"));)")
                                 }
                             }
-                            viewModel.search(query: clauses.joined(separator: ";"))
+                            Task { @MainActor [clauses] in
+                                viewModel.search(query: clauses.joined(separator: ";"))
+                            }
                         }
                     }
                 }

@@ -13,6 +13,8 @@ target 'LoaPalette' do
   pod 'Firebase/Analytics'
   pod 'Firebase/Crashlytics'
   pod 'Firebase/RemoteConfig'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Auth'
   
   # AdMob
   pod 'Google-Mobile-Ads-SDK'

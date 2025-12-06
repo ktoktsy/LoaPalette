@@ -210,12 +210,30 @@ struct NativeAdvancedAdView: UIViewRepresentable {
             // コールトゥアクションボタン
             if let callToAction = nativeAd.callToAction {
                 let ctaButton = UIButton(type: .system)
-                ctaButton.setTitle(callToAction, for: .normal)
-                ctaButton.backgroundColor = .systemBlue
-                ctaButton.setTitleColor(.white, for: .normal)
-                ctaButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-                ctaButton.layer.cornerRadius = 8
-                ctaButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+                // iOS 15.0以降ではUIButtonConfigurationを使用
+                if #available(iOS 15.0, *) {
+                    var config = UIButton.Configuration.filled()
+                    config.title = callToAction
+                    config.baseBackgroundColor = .systemBlue
+                    config.baseForegroundColor = .white
+                    config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                        var outgoing = incoming
+                        outgoing.font = .systemFont(ofSize: 14, weight: .semibold)
+                        return outgoing
+                    }
+                    config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+                    config.cornerStyle = .fixed
+                    config.background.cornerRadius = 8
+                    ctaButton.configuration = config
+                } else {
+                    // iOS 14以前のフォールバック
+                    ctaButton.setTitle(callToAction, for: .normal)
+                    ctaButton.backgroundColor = .systemBlue
+                    ctaButton.setTitleColor(.white, for: .normal)
+                    ctaButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+                    ctaButton.layer.cornerRadius = 8
+                    ctaButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+                }
                 adView.callToActionView = ctaButton
                 mainStackView.addArrangedSubview(ctaButton)
             }

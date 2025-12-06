@@ -87,9 +87,6 @@ struct MatchRecordsFullScreenView: View {
                     }
                 }
             }
-            .onAppear {
-                viewModel.loadDecks()
-            }
         }
     }
     

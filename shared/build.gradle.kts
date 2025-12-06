@@ -57,6 +57,8 @@ kotlin {
                 implementation(platform("com.google.firebase:firebase-bom:$firebaseBomVersion"))
                 implementation(libs.firebase.analytics)
                 implementation(libs.firebase.config)
+                implementation("com.google.firebase:firebase-firestore-ktx")
+                implementation("com.google.firebase:firebase-auth-ktx")
             }
         }
 

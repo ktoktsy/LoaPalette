@@ -9,9 +9,17 @@ import SwiftUI
 
 // デッキ詳細ビュー
 struct DeckDetailView: View {
-    let deckId: String
     @ObservedObject var viewModel: DeckListViewModel
     let onDismiss: () -> Void
+
+    // 初期デッキ（ViewModelから最新の情報を取得するための基準）
+    @State private var initialDeck: Deck
+    
+    // ViewModelから最新のデッキ情報を取得（computed property）
+    // ViewModelに最新の情報があればそれを使用、なければ初期デッキを使用
+    private var deck: Deck {
+        viewModel.decks.first { $0.id == initialDeck.id } ?? initialDeck
+    }
 
     @State private var isEditMode = false
     @State private var editedDeckName: String = ""
@@ -31,10 +39,12 @@ struct DeckDetailView: View {
         case list
         case grid
     }
-
-    // ViewModelから最新のデッキ情報を取得（computed propertyに戻す）
-    private var deck: Deck? {
-        viewModel.decks.first { $0.id == deckId }
+    
+    // 初期化
+    init(deck: Deck, viewModel: DeckListViewModel, onDismiss: @escaping () -> Void) {
+        self.viewModel = viewModel
+        self.onDismiss = onDismiss
+        _initialDeck = State(initialValue: deck)
     }
 
     // グリッド表示用のカラム定義
@@ -45,63 +55,34 @@ struct DeckDetailView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if let deck = deck {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 5) {
-                            // デッキ情報セクション
-                            deckInfoSection(deck: deck)
+            let currentDeck = deck
+            ScrollView {
+                VStack(alignment: .leading, spacing: 5) {
+                    // デッキ情報セクション
+                    deckInfoSection(deck: currentDeck)
 
-                            // 勝敗記録セクション
-                            WinLossSectionView(
-                                deck: deck,
-                                viewModel: viewModel,
-                                isExpanded: $isWinLossSectionExpanded,
-                                isAddMatchRecordPresented: $isAddMatchRecordPresented,
-                                isMatchRecordsFullScreenPresented: $isMatchRecordsFullScreenPresented
-                            )
+                    // 勝敗記録セクション
+                    WinLossSectionView(
+                        deck: currentDeck,
+                        viewModel: viewModel,
+                        isExpanded: $isWinLossSectionExpanded,
+                        isAddMatchRecordPresented: $isAddMatchRecordPresented,
+                        isMatchRecordsFullScreenPresented: $isMatchRecordsFullScreenPresented
+                    )
 
-                            // メモセクション
-                            memoSection(deck: deck)
+                    // メモセクション
+                    memoSection(deck: currentDeck)
 
-                            // カードリストセクション
-                            cardsSection(deck: deck)
-                        }
-                        .padding()
-                    }
-                    .navigationTitle(deck.name)
-                } else {
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                        Text(String(localized: "デッキを読み込み中..."))
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
-                        Text("deckId: \(deckId)")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                            .padding(.top, 8)
-                        Text(
-                            String(
-                                format: String(localized: "読み込まれたデッキ数: %lld"), viewModel.decks.count
-                            )
-                        )
-                        .foregroundColor(.secondary)
-                        .font(.caption)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .navigationTitle(String(localized: "デッキ詳細"))
+                    // カードリストセクション
+                    cardsSection(deck: currentDeck)
                 }
+                .padding()
             }
-            .navigationBarTitleDisplayMode(.large)
-            .onAppear {
-                // 表示時にデッキを再読み込み（アプリ起動直後の場合に備える）
-                viewModel.loadDecks()
-            }
-            .onChange(of: isCardSearchPresented) { oldValue, newValue in
-                // 検索画面が閉じられた時にデッキを再読み込み
-                if oldValue == true && newValue == false {
-                    viewModel.loadDecks()
+            .navigationTitle(currentDeck.name)
+            .onChange(of: viewModel.decks) { oldValue, newValue in
+                // ViewModelから最新のデッキ情報を取得できた場合は、initialDeckを更新
+                if let updatedDeck = newValue.first(where: { $0.id == initialDeck.id }) {
+                    initialDeck = updatedDeck
                 }
             }
             .toolbar {
@@ -115,16 +96,15 @@ struct DeckDetailView: View {
 
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
+                        let currentDeck = deck
                         if isEditMode {
-                            saveDeck(deck: deck!)
+                            saveDeck(deck: currentDeck)
                             isEditMode = false
                         } else {
-                            if let deck = deck {
-                                editedDeckName = deck.name
-                                editedInkColors = Set(deck.inkColors)
-                                previousInkColors = Set(deck.inkColors)
-                                editedMemo = deck.memo
-                            }
+                            editedDeckName = currentDeck.name
+                            editedInkColors = Set(currentDeck.inkColors)
+                            previousInkColors = Set(currentDeck.inkColors)
+                            editedMemo = currentDeck.memo
                             isEditMode = true
                         }
                     } label: {
@@ -151,41 +131,36 @@ struct DeckDetailView: View {
                 Text(String(localized: "このデッキを削除してもよろしいですか？"))
             }
             .fullScreenCover(isPresented: $isCardSearchPresented) {
-                if let deck = deck {
-                    // デッキのインク色をCardSearchFilterAccessoryView.Filterに変換
-                    let inkFilters = deck.inkColors.compactMap { ink in
-                        CardSearchFilterAccessoryView.Filter(rawValue: ink.rawValue)
-                    }
-                    CardSearchView(
-                        isPresentedAsSheet: true,
-                        targetDeckId: deck.id,
-                        initialInkFilters: inkFilters
-                    )
-                } else {
-                    CardSearchView(isPresentedAsSheet: true)
+                let currentDeck = deck
+                // デッキのインク色をCardSearchFilterAccessoryView.Filterに変換
+                let inkFilters = currentDeck.inkColors.compactMap { ink in
+                    CardSearchFilterAccessoryView.Filter(rawValue: ink.rawValue)
                 }
+                CardSearchView(
+                    isPresentedAsSheet: true,
+                    targetDeckId: currentDeck.id,
+                    initialInkFilters: inkFilters
+                )
             }
             .sheet(isPresented: $isAddMatchRecordPresented) {
-                if let deck = deck {
-                    AddMatchRecordView(
-                        deckId: deck.id,
-                        viewModel: viewModel,
-                        onDismiss: {
-                            isAddMatchRecordPresented = false
-                        }
-                    )
-                }
+                let currentDeck = deck
+                AddMatchRecordView(
+                    deckId: currentDeck.id,
+                    viewModel: viewModel,
+                    onDismiss: {
+                        isAddMatchRecordPresented = false
+                    }
+                )
             }
             .fullScreenCover(isPresented: $isMatchRecordsFullScreenPresented) {
-                if let deck = deck {
-                    MatchRecordsFullScreenView(
-                        deckId: deck.id,
-                        viewModel: viewModel,
-                        onDismiss: {
-                            isMatchRecordsFullScreenPresented = false
-                        }
-                    )
-                }
+                let currentDeck = deck
+                MatchRecordsFullScreenView(
+                    deckId: currentDeck.id,
+                    viewModel: viewModel,
+                    onDismiss: {
+                        isMatchRecordsFullScreenPresented = false
+                    }
+                )
             }
         }
     }
@@ -471,8 +446,8 @@ struct DeckDetailView: View {
     }
 
     private func deleteDeck() {
-        guard let deck = deck else { return }
-        viewModel.deleteDeck(deck.id)
+        let currentDeck = deck
+        viewModel.deleteDeck(currentDeck.id)
         onDismiss()
     }
 

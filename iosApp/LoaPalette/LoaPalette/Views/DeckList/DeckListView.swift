@@ -9,8 +9,7 @@ import SwiftUI
 
 struct DeckListView: View {
     @StateObject private var viewModel = DeckListViewModel()
-    @State private var selectedDeckId: String? = nil
-    @State private var isDeckDetailPresented = false
+    @State private var selectedDeck: Deck? = nil
     @State private var isNewDeckSheetPresented = false
     @State private var newDeckName: String = ""
     @State private var selectedInkColors: Set<Ink> = []
@@ -21,10 +20,6 @@ struct DeckListView: View {
             ZStack {
                 content
                     .navigationTitle(String(localized: "デッキリスト"))
-                    .onAppear {
-                        // 画面表示前にJSONからデッキを読み込む
-                        viewModel.loadDecks()
-                    }
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button {
@@ -34,13 +29,12 @@ struct DeckListView: View {
                             }
                         }
                     }
-                    .sheet(isPresented: $isDeckDetailPresented) {
+                    .sheet(item: $selectedDeck) { deck in
                         DeckDetailView(
-                            deckId: selectedDeckId ?? "",
+                            deck: deck,
                             viewModel: viewModel,
                             onDismiss: {
-                                selectedDeckId = nil
-                                isDeckDetailPresented = false
+                                selectedDeck = nil
                             }
                         )
                     }
@@ -104,8 +98,7 @@ struct DeckListView: View {
                     .onTapGesture {
                         print("DeckListView - deck tapped: \(deck.id), name: \(deck.name)")
                         AnalyticsManager.shared.logDeckSelect(deckName: deck.name)
-                        selectedDeckId = deck.id
-                        isDeckDetailPresented = true
+                        selectedDeck = deck
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button(role: .destructive) {
@@ -117,6 +110,9 @@ struct DeckListView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .refreshable {
+            await viewModel.refreshDecks()
+        }
     }
 
     private var newDeckSheet: some View {

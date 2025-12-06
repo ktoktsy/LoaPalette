@@ -111,9 +111,8 @@ struct TabBarItem: View {
     }
 }
 
-#Preview {
+#Preview(traits: .sizeThatFitsLayout) {
     CustomTabBar(selectedTab: .constant(0))
         .background(Color.black)
-        .previewLayout(.sizeThatFits)
 }
 

@@ -56,7 +56,7 @@ struct Deck: Codable, Identifiable, Equatable {
     // 既存のJSONとの互換性のため、inkColorsが存在しない場合は空配列を使用
     // matchRecordsが存在しない場合は空配列を使用
     // 後方互換性: wins/lossesが存在する場合はmatchRecordsに変換
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
@@ -75,18 +75,19 @@ struct Deck: Codable, Identifiable, Equatable {
             let losses = try container.decodeIfPresent(Int.self, forKey: .losses) ?? 0
             var records: [MatchRecord] = []
             // 既存のwins/lossesを試合記録に変換（日時はupdatedAtを使用）
+            // nonisolatedコンテキストで作成するため、nonisolatedイニシャライザーを使用
             for _ in 0..<wins {
-                records.append(MatchRecord(opponentInkColors: [], isWin: true, playedAt: updatedAt))
+                records.append(MatchRecord(id: UUID().uuidString, opponentInkColors: [], opponentDeckName: "", isWin: true, playedAt: updatedAt))
             }
             for _ in 0..<losses {
-                records.append(MatchRecord(opponentInkColors: [], isWin: false, playedAt: updatedAt))
+                records.append(MatchRecord(id: UUID().uuidString, opponentInkColors: [], opponentDeckName: "", isWin: false, playedAt: updatedAt))
             }
             matchRecords = records
         }
     }
 
     // Encodable準拠のため、matchRecordsをエンコード（wins/lossesは除外）
-    func encode(to encoder: Encoder) throws {
+    nonisolated func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)

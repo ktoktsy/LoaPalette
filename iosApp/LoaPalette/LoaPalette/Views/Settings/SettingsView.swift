@@ -94,10 +94,8 @@ struct SettingsView: View {
     private func contact() -> some View {
         Button {
             AnalyticsManager.shared.logSettingsContactClick()
-            if let url = URL(
-                string:
-                    "https://docs.google.com/forms/d/e/1FAIpQLSemPSvKx63Czk_3nwdpOyrou943bHQ27JXbsZxqoiyeP3Skdg/viewform?usp=sharing&ouid=112820201528893412570"
-            ) {
+            let formUrl = RemoteConfigManager.shared.getString(forKey: "form_url")
+            if !formUrl.isEmpty, let url = URL(string: formUrl) {
                 UIApplication.shared.open(url)
             }
         } label: {
