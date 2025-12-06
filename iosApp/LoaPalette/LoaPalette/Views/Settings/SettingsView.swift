@@ -5,9 +5,9 @@
 //  Created by 片岡寿哉 on 2025/11/28.
 //
 
+import GoogleMobileAds
 import SwiftUI
 import UIKit
-import GoogleMobileAds
 
 private enum SettingsItem: Identifiable {
     case officialSite
@@ -94,7 +94,10 @@ struct SettingsView: View {
     private func contact() -> some View {
         Button {
             AnalyticsManager.shared.logSettingsContactClick()
-            if let url = URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSemPSvKx63Czk_3nwdpOyrou943bHQ27JXbsZxqoiyeP3Skdg/viewform?usp=sharing&ouid=112820201528893412570") {
+            if let url = URL(
+                string:
+                    "https://docs.google.com/forms/d/e/1FAIpQLSemPSvKx63Czk_3nwdpOyrou943bHQ27JXbsZxqoiyeP3Skdg/viewform?usp=sharing&ouid=112820201528893412570"
+            ) {
                 UIApplication.shared.open(url)
             }
         } label: {
@@ -109,11 +112,11 @@ struct SettingsView: View {
     private func cell(title: String, systemName: String?) -> some View {
         HStack {
             Text(title)
-                .foregroundColor(.white)
+                .foregroundColor(.primary)
             Spacer()
             if let systemName {
                 Image(systemName: systemName)
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
             }
         }
     }
