@@ -1,26 +1,24 @@
-package com.loapalette.shared
+//
+//  RemoteConfigDefaults.swift
+//  LoaPalette
+//
+//  Created by Auto on 2025/01/XX.
+//
 
-/**
- * Firebase Remote Configのデフォルト値を定義するオブジェクト
- * 参考: https://firebase.google.com/docs/remote-config
- */
-object RemoteConfigDefaults {
-    /**
-     * デフォルト値のマップを取得
-     * @return キーとデフォルト値のマップ
-     */
-    fun getDefaults(): Map<String, Any> {
-        return mapOf(
-            RemoteConfigKeys.DISCLAIMER_CONTENT to getDisclaimerDefault(),
-            RemoteConfigKeys.PRIVACY_POLICY_CONTENT to getPrivacyPolicyDefault(),
-            RemoteConfigKeys.TERMS_OF_SERVICE_CONTENT to getTermsOfServiceDefault(),
-        )
+import Foundation
+
+/// Remote Configのデフォルト値を提供するクラス
+/// sharedモジュールのRemoteConfigDefaultsと同様の内容を提供
+class RemoteConfigDefaults {
+    static func getDefaults() -> [String: Any] {
+        return [
+            "disclaimer_content": getDisclaimerDefault(),
+            "privacy_policy_content": getPrivacyPolicyDefault(),
+            "terms_of_service_content": getTermsOfServiceDefault(),
+        ]
     }
     
-    /**
-     * 免責事項のデフォルト値（JSON文字列）
-     */
-    private fun getDisclaimerDefault(): String {
+    private static func getDisclaimerDefault() -> String {
         return """
         {
           "title": "免責事項",
@@ -31,7 +29,7 @@ object RemoteConfigDefaults {
             },
             {
               "title": "2. カード画像・データについて",
-              "content": "本アプリで表示されるカード画像およびデータは、以下のソースから取得しています：\n• Lorcana API (https://lorcana-api.com)\n• 株式会社タカラトミー公式サイト\n\n本アプリで表示されるカード画像、イラスト、ロゴ、その他の画像は、それぞれの著作権者に帰属します。本アプリは、これらの画像を表示するためのツールとしてのみ提供されており、画像の著作権を主張するものではありません。"
+              "content": "本アプリで表示されるカード画像およびデータは、以下のソースから取得しています：\\n• Lorcana API (https://lorcana-api.com)\\n• 株式会社タカラトミー公式サイト\\n\\n本アプリで表示されるカード画像、イラスト、ロゴ、その他の画像は、それぞれの著作権者に帰属します。本アプリは、これらの画像を表示するためのツールとしてのみ提供されており、画像の著作権を主張するものではありません。"
             },
             {
               "title": "3. ディズニーロルカナの知的財産権について",
@@ -39,7 +37,7 @@ object RemoteConfigDefaults {
             },
             {
               "title": "4. 外部API・サービスについて",
-              "content": "本アプリは、以下の外部API・サービスを利用しています：\n• Lorcana API (https://lorcana-api.com)\n\n本アプリは、これらの外部API・サービスの可用性、正確性、完全性について一切の保証をいたしません。外部API・サービスの障害、変更、または終了により、本アプリの機能が影響を受ける可能性があります。"
+              "content": "本アプリは、以下の外部API・サービスを利用しています：\\n• Lorcana API (https://lorcana-api.com)\\n\\n本アプリは、これらの外部API・サービスの可用性、正確性、完全性について一切の保証をいたしません。外部API・サービスの障害、変更、または終了により、本アプリの機能が影響を受ける可能性があります。"
             },
             {
               "title": "5. データの正確性について",
@@ -60,13 +58,10 @@ object RemoteConfigDefaults {
           ],
           "lastUpdated": "2025年1月"
         }
-        """.trimIndent()
+        """
     }
     
-    /**
-     * プライバシーポリシーのデフォルト値（JSON文字列）
-     */
-    private fun getPrivacyPolicyDefault(): String {
+    private static func getPrivacyPolicyDefault() -> String {
         return """
         {
           "title": "プライバシーポリシー",
@@ -74,23 +69,23 @@ object RemoteConfigDefaults {
           "sections": [
             {
               "title": "1. 収集する情報",
-              "content": "本アプリでは、以下の情報を収集する場合があります：\n• アプリの使用状況データ（クラッシュレポート、パフォーマンスデータなど）\n• 広告の表示・クリックに関するデータ\n• デバイス情報（OSバージョン、デバイスモデルなど）\n• アプリの利用状況に関する匿名化された統計情報"
+              "content": "本アプリでは、以下の情報を収集する場合があります：\\n• アプリの使用状況データ（クラッシュレポート、パフォーマンスデータなど）\\n• 広告の表示・クリックに関するデータ\\n• デバイス情報（OSバージョン、デバイスモデルなど）\\n• アプリの利用状況に関する匿名化された統計情報"
             },
             {
               "title": "2. 情報の利用目的",
-              "content": "収集した情報は、以下の目的で利用します：\n• アプリの品質向上および不具合の修正\n• 広告の配信および効果測定\n• アプリの機能改善および新機能の開発\n• リモート設定の管理"
+              "content": "収集した情報は、以下の目的で利用します：\\n• アプリの品質向上および不具合の修正\\n• 広告の配信および効果測定\\n• アプリの機能改善および新機能の開発\\n• リモート設定の管理"
             },
             {
               "title": "3. Firebaseサービスの利用",
-              "content": "本アプリは、Googleが提供するFirebaseサービスを利用しています。Firebaseを通じて収集される情報の取り扱いについては、Googleのプライバシーポリシーが適用されます。\n\n利用しているFirebaseサービス：\n• Firebase Analytics: アプリの使用状況を分析\n• Firebase Crashlytics: クラッシュレポートの収集\n• Firebase Remote Config: リモート設定の管理\n• Firebase Firestore: データの保存（ユーザーデータを保存する場合）\n• Firebase Authentication: 認証機能（認証機能を使用する場合）\n\nFirebaseのプライバシーポリシー: https://firebase.google.com/support/privacy"
+              "content": "本アプリは、Googleが提供するFirebaseサービスを利用しています。Firebaseを通じて収集される情報の取り扱いについては、Googleのプライバシーポリシーが適用されます。\\n\\n利用しているFirebaseサービス：\\n• Firebase Analytics: アプリの使用状況を分析\\n• Firebase Crashlytics: クラッシュレポートの収集\\n• Firebase Remote Config: リモート設定の管理\\n• Firebase Firestore: データの保存（ユーザーデータを保存する場合）\\n• Firebase Authentication: 認証機能（認証機能を使用する場合）\\n\\nFirebaseのプライバシーポリシー: https://firebase.google.com/support/privacy"
             },
             {
               "title": "4. Google AdMobの利用",
-              "content": "本アプリは、Google AdMob（Google Mobile Ads SDK）を使用して広告を配信しています。AdMobは、広告の配信、効果測定、不正防止のために、以下の情報を収集・利用する場合があります：\n• デバイス情報（広告ID、デバイスモデル、OSバージョンなど）\n• 広告の表示・クリックに関する情報\n• 位置情報（設定により許可した場合）\n\nGoogle AdMobのプライバシーポリシー: https://policies.google.com/privacy\nGoogleの広告に関する方針: https://policies.google.com/technologies/ads"
+              "content": "本アプリは、Google AdMob（Google Mobile Ads SDK）を使用して広告を配信しています。AdMobは、広告の配信、効果測定、不正防止のために、以下の情報を収集・利用する場合があります：\\n• デバイス情報（広告ID、デバイスモデル、OSバージョンなど）\\n• 広告の表示・クリックに関する情報\\n• 位置情報（設定により許可した場合）\\n\\nGoogle AdMobのプライバシーポリシー: https://policies.google.com/privacy\\nGoogleの広告に関する方針: https://policies.google.com/technologies/ads"
             },
             {
               "title": "5. 情報の共有",
-              "content": "収集した情報は、以下の場合を除き、第三者に提供・共有することはありません：\n• 法令に基づく開示が求められた場合\n• ユーザーの同意がある場合\n• 本アプリのサービス提供に必要な範囲で、信頼できるサービスプロバイダーに委託する場合（Firebase、Google AdMobなど）"
+              "content": "収集した情報は、以下の場合を除き、第三者に提供・共有することはありません：\\n• 法令に基づく開示が求められた場合\\n• ユーザーの同意がある場合\\n• 本アプリのサービス提供に必要な範囲で、信頼できるサービスプロバイダーに委託する場合（Firebase、Google AdMobなど）"
             },
             {
               "title": "6. データの保存",
@@ -98,7 +93,7 @@ object RemoteConfigDefaults {
             },
             {
               "title": "7. ユーザーの権利",
-              "content": "ユーザーは、以下の権利を有します：\n• 個人情報の開示を求める権利\n• 個人情報の訂正・削除を求める権利\n• 広告のパーソナライゼーションを無効にする権利（デバイスの設定から変更可能）\n• アナリティクスの収集を無効にする権利（デバイスの設定から変更可能）"
+              "content": "ユーザーは、以下の権利を有します：\\n• 個人情報の開示を求める権利\\n• 個人情報の訂正・削除を求める権利\\n• 広告のパーソナライゼーションを無効にする権利（デバイスの設定から変更可能）\\n• アナリティクスの収集を無効にする権利（デバイスの設定から変更可能）"
             },
             {
               "title": "8. 子どものプライバシー",
@@ -115,13 +110,10 @@ object RemoteConfigDefaults {
           ],
           "lastUpdated": "2025年1月"
         }
-        """.trimIndent()
+        """
     }
     
-    /**
-     * 利用規約のデフォルト値（JSON文字列）
-     */
-    private fun getTermsOfServiceDefault(): String {
+    private static func getTermsOfServiceDefault() -> String {
         return """
         {
           "title": "利用規約",
@@ -133,15 +125,15 @@ object RemoteConfigDefaults {
             },
             {
               "title": "2. 利用資格",
-              "content": "本アプリは、以下の条件を満たすユーザーが利用できます：\n• 本規約に同意すること\n• 適用法令に従って本アプリを利用する権利を有すること\n• 13歳以上であること（13歳未満の場合は、保護者の同意が必要）"
+              "content": "本アプリは、以下の条件を満たすユーザーが利用できます：\\n• 本規約に同意すること\\n• 適用法令に従って本アプリを利用する権利を有すること\\n• 13歳以上であること（13歳未満の場合は、保護者の同意が必要）"
             },
             {
               "title": "3. 利用許諾",
-              "content": "当方は、ユーザーに対し、本規約に基づき、本アプリを個人的かつ非商業的な目的でのみ利用することを許諾します。本アプリの利用は、以下の制限の下で行われます：\n• 本アプリを複製、改変、リバースエンジニアリング、または逆コンパイルすることは禁止されています\n• 本アプリを商業目的で利用することは禁止されています\n• 本アプリの機能を妨害または損なう行為は禁止されています"
+              "content": "当方は、ユーザーに対し、本規約に基づき、本アプリを個人的かつ非商業的な目的でのみ利用することを許諾します。本アプリの利用は、以下の制限の下で行われます：\\n• 本アプリを複製、改変、リバースエンジニアリング、または逆コンパイルすることは禁止されています\\n• 本アプリを商業目的で利用することは禁止されています\\n• 本アプリの機能を妨害または損なう行為は禁止されています"
             },
             {
               "title": "4. 禁止行為",
-              "content": "ユーザーは、以下の行為を行ってはなりません：\n• 法令または公序良俗に違反する行為\n• 犯罪行為に関連する行為\n• 本アプリのサーバーまたはネットワークに不正にアクセスする行為\n• 本アプリの機能を妨害する行為\n• 他のユーザーに迷惑をかける行為\n• 本アプリに関連して、反社会的勢力等に利益を提供する行為"
+              "content": "ユーザーは、以下の行為を行ってはなりません：\\n• 法令または公序良俗に違反する行為\\n• 犯罪行為に関連する行為\\n• 本アプリのサーバーまたはネットワークに不正にアクセスする行為\\n• 本アプリの機能を妨害する行為\\n• 他のユーザーに迷惑をかける行為\\n• 本アプリに関連して、反社会的勢力等に利益を提供する行為"
             },
             {
               "title": "5. 知的財産権",
@@ -174,6 +166,7 @@ object RemoteConfigDefaults {
           ],
           "lastUpdated": "2025年1月"
         }
-        """.trimIndent()
+        """
     }
 }
+

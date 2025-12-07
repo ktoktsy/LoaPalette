@@ -12,6 +12,9 @@ import UIKit
 private enum SettingsItem: Identifiable {
     case officialSite
     case contact
+    case privacyPolicy
+    case termsOfService
+    case disclaimer
 
     var id: String {
         switch self {
@@ -19,6 +22,12 @@ private enum SettingsItem: Identifiable {
             return "officialSite"
         case .contact:
             return "contact"
+        case .privacyPolicy:
+            return "privacyPolicy"
+        case .termsOfService:
+            return "termsOfService"
+        case .disclaimer:
+            return "disclaimer"
         }
     }
 }
@@ -28,6 +37,9 @@ struct SettingsView: View {
 
     private let items: [SettingsItem] = [
         .officialSite,
+        .privacyPolicy,
+        .termsOfService,
+        .disclaimer,
         .contact,
     ]
 
@@ -48,6 +60,27 @@ struct SettingsView: View {
                         switch item {
                         case .officialSite:
                             officialSite()
+                        case .privacyPolicy:
+                            NavigationLink(destination: PrivacyPolicyView()) {
+                                cell(
+                                    title: String(localized: "プライバシーポリシー"),
+                                    systemName: nil
+                                )
+                            }
+                        case .termsOfService:
+                            NavigationLink(destination: TermsOfServiceView()) {
+                                cell(
+                                    title: String(localized: "利用規約"),
+                                    systemName: nil
+                                )
+                            }
+                        case .disclaimer:
+                            NavigationLink(destination: DisclaimerView()) {
+                                cell(
+                                    title: String(localized: "免責事項"),
+                                    systemName: nil
+                                )
+                            }
                         case .contact:
                             contact()
                         }

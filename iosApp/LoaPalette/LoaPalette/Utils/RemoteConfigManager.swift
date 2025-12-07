@@ -7,6 +7,7 @@
 
 import FirebaseRemoteConfig
 import Foundation
+import shared
 
 /// Firebase Remote Configの共通処理を管理するクラス
 /// 参考: https://firebase.google.com/docs/remote-config/ios/start
@@ -19,10 +20,16 @@ class RemoteConfigManager {
         remoteConfig = RemoteConfig.remoteConfig()
 
         // デフォルト値の設定
-        // 注意: sharedモジュールのRemoteConfigDefaultsを使用することを推奨します
-        // 現在は空のデフォルト値を設定しています
-        let defaults: [String: NSObject] = [:]
-        remoteConfig.setDefaults(defaults)
+        // sharedモジュールのRemoteConfigDefaultsから取得
+        let defaults = RemoteConfigDefaults.getDefaults()
+        // KotlinのMapをSwiftのDictionaryに変換し、NSObjectにキャスト
+        var swiftDefaults: [String: NSObject] = [:]
+        for (key, value) in defaults {
+            if let stringValue = value as? String {
+                swiftDefaults[key] = stringValue as NSObject
+            }
+        }
+        remoteConfig.setDefaults(swiftDefaults)
 
         // フェッチ間隔の設定（デバッグ用: 0秒、本番用: 3600秒）
         #if DEBUG
@@ -106,5 +113,14 @@ class RemoteConfigManager {
             return nil
         }
         return json
+    }
+
+    /// デフォルト値を取得（sharedモジュールのRemoteConfigDefaultsから取得）
+    /// - Parameter key: キー名
+    /// - Returns: デフォルト値（存在しない場合は空文字列）
+    func getDefaultValue(forKey key: String) -> String {
+        // sharedモジュールのRemoteConfigDefaultsから取得
+        let defaults = RemoteConfigDefaults.getDefaults()
+        return defaults[key] as? String ?? ""
     }
 }
