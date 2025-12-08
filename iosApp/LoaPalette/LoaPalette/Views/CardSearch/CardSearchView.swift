@@ -224,16 +224,17 @@ struct CardSearchView: View {
                 onSelect: { searchClause in
                     // 詳細検索時は検索バーのテキストは変更せず、searchパラメータだけ更新.
                     viewModel.search(query: searchClause)
-                    
+
                     // デフォルト値を除いた検索パラメータを取得
                     var parameters: [String: Any] = [:]
-                    
+
                     // カード名
-                    let trimmedName = filterNameQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let trimmedName = filterNameQuery.trimmingCharacters(
+                        in: .whitespacesAndNewlines)
                     if !trimmedName.isEmpty {
                         parameters["name_query"] = trimmedName
                     }
-                    
+
                     // コスト範囲
                     if filterMinCost != 0 || filterMaxCost != 10 {
                         if filterMinCost != 0 {
@@ -243,7 +244,7 @@ struct CardSearchView: View {
                             parameters["max_cost"] = filterMaxCost
                         }
                     }
-                    
+
                     // 攻撃力範囲
                     if filterMinStrength != 0 || filterMaxStrength != 20 {
                         if filterMinStrength != 0 {
@@ -253,7 +254,7 @@ struct CardSearchView: View {
                             parameters["max_strength"] = filterMaxStrength
                         }
                     }
-                    
+
                     // 防御力範囲
                     if filterMinWillpower != 0 || filterMaxWillpower != 20 {
                         if filterMinWillpower != 0 {
@@ -263,7 +264,7 @@ struct CardSearchView: View {
                             parameters["max_willpower"] = filterMaxWillpower
                         }
                     }
-                    
+
                     // ロア範囲
                     if filterMinLore != 0 || filterMaxLore != 5 {
                         if filterMinLore != 0 {
@@ -273,45 +274,46 @@ struct CardSearchView: View {
                             parameters["max_lore"] = filterMaxLore
                         }
                     }
-                    
+
                     // セット名
-                    let trimmedSetName = filterSetName.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let trimmedSetName = filterSetName.trimmingCharacters(
+                        in: .whitespacesAndNewlines)
                     if !trimmedSetName.isEmpty {
                         parameters["set_name"] = trimmedSetName
                     }
-                    
+
                     // イラストレーター
                     let trimmedArtist = filterArtist.trimmingCharacters(in: .whitespacesAndNewlines)
                     if !trimmedArtist.isEmpty {
                         parameters["artist"] = trimmedArtist
                     }
-                    
+
                     // インク可能
                     if inkableFilter != .any {
                         parameters["inkable"] = inkableFilter.rawValue
                     }
-                    
+
                     // インクカラー
                     if !selectedFilters.isEmpty {
                         let inkColors = Array(selectedFilters).map { $0.rawValue }
                         parameters["ink_colors"] = inkColors.joined(separator: ",")
                     }
-                    
+
                     // カードタイプ
                     if !selectedTypes.isEmpty {
                         let types = Array(selectedTypes).map { $0.rawValue }
                         parameters["card_types"] = types.joined(separator: ",")
                     }
-                    
+
                     // レアリティ
                     if !selectedRarities.isEmpty {
                         let rarities = Array(selectedRarities).map { $0.rawValue }
                         parameters["rarities"] = rarities.joined(separator: ",")
                     }
-                    
+
                     // イベント送信
                     AnalyticsManager.shared.logCardSearchExecute(parameters: parameters)
-                    
+
                     isFilterSheetPresented = false
                 }
             )
@@ -418,6 +420,9 @@ struct CardSearchView: View {
             }
             .padding()
         }
+        .refreshable {
+            await refreshCards()
+        }
     }
 
     // エラー表示ビュー.
@@ -459,22 +464,83 @@ struct CardSearchView: View {
     // 検索結果グリッド.
     private var cardsGrid: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVGrid(columns: gridColumns, spacing: 16) {
-                ForEach(filteredCards) { card in
-                    CardItemView(
-                        card: card,
-                        isSelected: selectedCards.contains(card.id),
-                        onTap: {
-                            if selectedCards.contains(card.id) {
-                                selectedCards.remove(card.id)
-                            } else {
-                                selectedCards.insert(card.id)
+            VStack(spacing: 16) {
+                LazyVGrid(columns: gridColumns, spacing: 16) {
+                    ForEach(Array(filteredCards.enumerated()), id: \.element.id) { index, card in
+                        CardItemView(
+                            card: card,
+                            isSelected: selectedCards.contains(card.id),
+                            onTap: {
+                                if selectedCards.contains(card.id) {
+                                    selectedCards.remove(card.id)
+                                } else {
+                                    selectedCards.insert(card.id)
+                                }
+                            }
+                        )
+                        .onAppear {
+                            // 最後から5件目に到達したら追加読み込み
+                            if index == filteredCards.count - 5 && viewModel.hasMore
+                                && !viewModel.isLoadingMore
+                            {
+                                viewModel.loadMore()
                             }
                         }
-                    )
+                    }
+                }
+
+                // ローディングインジケーター
+                if viewModel.isLoadingMore {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .padding()
+                        Spacer()
+                    }
                 }
             }
             .padding()
+        }
+        .refreshable {
+            await refreshCards()
+        }
+    }
+
+    // プルリフレッシュ時のアクション.
+    private func refreshCards() async {
+        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmed.isEmpty {
+            // 検索テキストが空の場合、インクフィルターがあればそれで検索
+            if !selectedFilters.isEmpty {
+                let colorClauses = Array(selectedFilters).map { $0.searchClause }
+                let searchQuery =
+                    colorClauses.count == 1
+                    ? colorClauses[0]
+                    : "(\(colorClauses.joined(separator: ";|"));)"
+                await MainActor.run {
+                    viewModel.search(query: searchQuery)
+                }
+            } else {
+                // フィルターもない場合は全カードを読み込み
+                await MainActor.run {
+                    viewModel.loadAllCards()
+                }
+            }
+        } else {
+            // 検索テキストがある場合、インクフィルターと組み合わせる
+            var clauses: [String] = ["name~\(trimmed)"]
+            if !selectedFilters.isEmpty {
+                let colorClauses = Array(selectedFilters).map { $0.searchClause }
+                if colorClauses.count == 1 {
+                    clauses.append(colorClauses[0])
+                } else if colorClauses.count > 1 {
+                    clauses.append("(\(colorClauses.joined(separator: ";|"));)")
+                }
+            }
+            await MainActor.run {
+                viewModel.search(query: clauses.joined(separator: ";"))
+            }
         }
     }
 }

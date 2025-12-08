@@ -12,21 +12,22 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 // APIクライアント
-// 参考: https://lorcana-api.com/docs/intro/
+// 参考: https://api-lorcana.com/#/Cards/get%20cards
 class LorcanaApiClient(private val httpClient: HttpClient) {
     companion object {
-        private const val BASE_URL = "https://api.lorcana-api.com"
+        private const val BASE_URL = "https://api-lorcana.com"
     }
     
     // 全カード取得
-    suspend fun getAllCards(page: Int = 1, pageSize: Int = 1000): Result<CardsResponse> {
+    suspend fun getAllCards(page: Int = 1, pageSize: Int = 20): Result<CardsResponse> {
         return withContext(Dispatchers.Default) {
             try {
-                val response = httpClient.get("$BASE_URL/cards/all") {
+                val response = httpClient.get("$BASE_URL/cards") {
+                    parameter("limit", pageSize)
                     parameter("page", page)
-                    parameter("pagesize", pageSize)
                 }
-                val cards = response.body<List<LorcanaCard>>()
+                val apiCards = response.body<List<LorcanaCardApiResponse>>()
+                val cards = apiCards.map { it.toLorcanaCard() }
                 Result.success(CardsResponse(cards = cards, page = page, pageSize = pageSize))
             } catch (e: Exception) {
                 Result.failure(e)
@@ -39,17 +40,17 @@ class LorcanaApiClient(private val httpClient: HttpClient) {
         searchQuery: String? = null,
         strict: String? = null,
         page: Int = 1,
-        pageSize: Int = 1000
+        pageSize: Int = 20
     ): Result<CardsResponse> {
         return withContext(Dispatchers.Default) {
             try {
-                val response = httpClient.get("$BASE_URL/cards/fetch") {
-                    searchQuery?.let { parameter("search", it) }
-                    strict?.let { parameter("strict", it) }
+                val response = httpClient.get("$BASE_URL/cards") {
+                    parameter("limit", pageSize)
                     parameter("page", page)
-                    parameter("pagesize", pageSize)
+                    searchQuery?.let { parameter("search", it) }
                 }
-                val cards = response.body<List<LorcanaCard>>()
+                val apiCards = response.body<List<LorcanaCardApiResponse>>()
+                val cards = apiCards.map { it.toLorcanaCard() }
                 Result.success(CardsResponse(cards = cards, page = page, pageSize = pageSize))
             } catch (e: Exception) {
                 Result.failure(e)
