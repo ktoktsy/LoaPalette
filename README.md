@@ -38,16 +38,6 @@ cd iosApp
 xcodebuild -workspace iosApp.xcworkspace -scheme iosApp -configuration Debug
 ```
 
-## ガラスエフェクト
-
-### iOS側
-- SwiftUIの `.ultraThinMaterial` を使用
-- ネイティブのUIVisualEffectView相当の効果
-
-### Android側
-- Composeの半透明背景とグラデーションを使用
-- Material 3のテーマシステムと統合
-
 ## 参考リンク
 
 - [Kotlin Multiplatform Mobile](https://kotlinlang.org/docs/multiplatform-mobile-getting-started.html)
