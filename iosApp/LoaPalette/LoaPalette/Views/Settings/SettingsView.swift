@@ -15,6 +15,7 @@ private enum SettingsItem: Identifiable {
     case privacyPolicy
     case termsOfService
     case disclaimer
+    case clearCache
 
     var id: String {
         switch self {
@@ -28,6 +29,8 @@ private enum SettingsItem: Identifiable {
             return "termsOfService"
         case .disclaimer:
             return "disclaimer"
+        case .clearCache:
+            return "clearCache"
         }
     }
 }
@@ -37,6 +40,7 @@ struct SettingsView: View {
 
     private let items: [SettingsItem] = [
         .officialSite,
+        .clearCache,
         .privacyPolicy,
         .termsOfService,
         .disclaimer,
@@ -83,6 +87,8 @@ struct SettingsView: View {
                             }
                         case .contact:
                             contact()
+                        case .clearCache:
+                            clearCache()
                         }
                     }
                 }
@@ -138,6 +144,41 @@ struct SettingsView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    private func clearCache() -> some View {
+        Button {
+            clearAllCache()
+        } label: {
+            cell(
+                title: String(localized: "キャッシュを削除"),
+                systemName: "trash"
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// すべてのキャッシュを削除
+    /// 参考: https://developer.apple.com/documentation/foundation/urlcache
+    private func clearAllCache() {
+        // URLSessionのキャッシュを削除
+        URLCache.shared.removeAllCachedResponses()
+
+        // 広告キャッシュを削除
+        AdManager.shared.clearAllAds()
+
+        // アラートを表示
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let rootViewController = windowScene.windows.first?.rootViewController
+        {
+            let alert = UIAlertController(
+                title: String(localized: "キャッシュを削除しました"),
+                message: nil,
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: String(localized: "OK"), style: .default))
+            rootViewController.present(alert, animated: true)
+        }
     }
 
     private func cell(title: String, systemName: String?) -> some View {
