@@ -466,7 +466,7 @@ struct CardSearchView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 16) {
                 LazyVGrid(columns: gridColumns, spacing: 16) {
-                    ForEach(Array(filteredCards.enumerated()), id: \.element.id) { index, card in
+                    ForEach(Array(filteredCards.enumerated()), id: \.offset) { index, card in
                         CardItemView(
                             card: card,
                             isSelected: selectedCards.contains(card.id),
@@ -529,7 +529,8 @@ struct CardSearchView: View {
             }
         } else {
             // 検索テキストがある場合、インクフィルターと組み合わせる
-            var clauses: [String] = ["name~\(trimmed)"]
+            // 新しいAPIのフィールド名は大文字（Name, Colorなど）
+            var clauses: [String] = ["Name~\(trimmed)"]
             if !selectedFilters.isEmpty {
                 let colorClauses = Array(selectedFilters).map { $0.searchClause }
                 if colorClauses.count == 1 {

@@ -9,7 +9,7 @@ import Combine
 import SwiftUI
 
 // 一時的な回避策: Kotlin側のクラスが認識されるまで、Swift側で完全に実装
-// 参考: https://api-lorcana.com/#/Cards/get%20cards
+// 参考: https://lorcana-api.com/docs/intro
 @MainActor
 class CardSearchViewModel: ObservableObject {
     @Published var cards: [LorcanaCard] = []
@@ -107,10 +107,10 @@ class CardSearchViewModel: ObservableObject {
     }
 
     // API呼び出し
-    // API仕様: https://api-lorcana.com/#/Cards/get%20cards
+    // API仕様: https://lorcana-api.com/docs/intro
     private func performSearch(query: String, page: Int) async {
-        // api-lorcana.comのエンドポイントを使用
-        guard var urlComponents = URLComponents(string: "https://api-lorcana.com/cards")
+        // api.lorcana-api.comのエンドポイントを使用
+        guard var urlComponents = URLComponents(string: "https://api.lorcana-api.com/cards/fetch")
         else {
             errorMessage = "無効なURLです"
             searchState = .error
@@ -124,15 +124,16 @@ class CardSearchViewModel: ObservableObject {
         }
 
         // 検索パラメータを追加
-        var queryItems: [URLQueryItem] = [
-            URLQueryItem(name: "limit", value: "\(pageSize)"),
-            URLQueryItem(name: "page", value: "\(page)"),
-        ]
+        var queryItems: [URLQueryItem] = []
 
         // 検索クエリが空でない場合は追加
         if !query.isEmpty {
             queryItems.append(URLQueryItem(name: "search", value: query))
         }
+
+        // ページネーションパラメータを追加
+        queryItems.append(URLQueryItem(name: "page", value: "\(page)"))
+        queryItems.append(URLQueryItem(name: "pagesize", value: "\(pageSize)"))
 
         urlComponents.queryItems = queryItems
 
@@ -231,8 +232,9 @@ class CardSearchViewModel: ObservableObject {
     }
 
     private func performLoadAllCards(page: Int) async {
-        // api-lorcana.comのエンドポイントを使用
-        guard var urlComponents = URLComponents(string: "https://api-lorcana.com/cards") else {
+        // api.lorcana-api.comのエンドポイントを使用
+        guard var urlComponents = URLComponents(string: "https://api.lorcana-api.com/cards/all")
+        else {
             errorMessage = "無効なURLです"
             searchState = .error
             if page == 1 {
@@ -245,8 +247,8 @@ class CardSearchViewModel: ObservableObject {
         }
 
         urlComponents.queryItems = [
-            URLQueryItem(name: "limit", value: "\(pageSize)"),
             URLQueryItem(name: "page", value: "\(page)"),
+            URLQueryItem(name: "pagesize", value: "\(pageSize)"),
         ]
 
         guard let url = urlComponents.url else {

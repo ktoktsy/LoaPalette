@@ -6,9 +6,9 @@
 //
 
 import Combine
+import FirebaseFirestore
 import Foundation
 import SwiftUI
-import FirebaseFirestore
 
 // デッキリスト管理ViewModel
 // Firestoreを使用してデッキを管理
@@ -23,9 +23,10 @@ class DeckListViewModel: ObservableObject {
     private var listenerRegistration: ListenerRegistration?
     private let migrationKey = "hasMigratedToFirestore"
     private let fileName = "decks.json"
-    
+
     private var fileURL: URL {
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[
+            0]
         return documentsPath.appendingPathComponent(fileName)
     }
 
@@ -35,11 +36,11 @@ class DeckListViewModel: ObservableObject {
         setupFirestoreListener()
         migrateLocalDataIfNeeded()
     }
-    
+
     // 初回読み込みを実行（リスナー設定前でも確実にデータを取得）
     private func loadInitialDecks() {
         isLoading = true
-        
+
         Task { @MainActor in
             await loadDecksOnce()
         }
@@ -50,11 +51,11 @@ class DeckListViewModel: ObservableObject {
         // 既存のリスナーを削除
         listenerRegistration?.remove()
         listenerRegistration = nil
-        
+
         listenerRegistration = firestoreManager.observeDecks { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
-                
+
                 switch result {
                 case .success(let loadedDecks):
                     self.decks = loadedDecks
@@ -67,17 +68,17 @@ class DeckListViewModel: ObservableObject {
                     // 認証エラーの場合は再試行
                     if (error as NSError).code == -1 {
                         // 少し待ってから再試行
-                        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1秒待機
+                        try? await Task.sleep(nanoseconds: 1_000_000_000)  // 1秒待機
                         self.setupFirestoreListener()
                     }
                 }
             }
         }
-        
+
         // リスナーが設定されなかった場合（認証待ち）、少し待ってから再試行
         if listenerRegistration == nil {
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1秒待機
+                try? await Task.sleep(nanoseconds: 1_000_000_000)  // 1秒待機
                 if self.listenerRegistration == nil {
                     print("リスナーの再試行中...")
                     self.setupFirestoreListener()
@@ -85,7 +86,7 @@ class DeckListViewModel: ObservableObject {
             }
         }
     }
-    
+
     // 初回読み込み（リスナーが設定できない場合のフォールバック）
     private func loadDecksOnce() async {
         await withCheckedContinuation { continuation in
@@ -95,7 +96,7 @@ class DeckListViewModel: ObservableObject {
                         continuation.resume()
                         return
                     }
-                    
+
                     switch result {
                     case .success(let loadedDecks):
                         self.decks = loadedDecks
@@ -117,13 +118,13 @@ class DeckListViewModel: ObservableObject {
         if UserDefaults.standard.bool(forKey: migrationKey) {
             return
         }
-        
+
         // ローカルJSONファイルが存在する場合のみ移行
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             UserDefaults.standard.set(true, forKey: migrationKey)
             return
         }
-        
+
         Task { @MainActor in
             do {
                 // ローカルJSONファイルを読み込む
@@ -131,9 +132,9 @@ class DeckListViewModel: ObservableObject {
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .iso8601
                 let localDecks = try decoder.decode([Deck].self, from: data)
-                
+
                 print("ローカルデータの移行を開始: \(localDecks.count)個のデッキを移行します")
-                
+
                 // 各デッキをFirestoreに保存
                 var successCount = 0
                 for deck in localDecks {
@@ -146,9 +147,9 @@ class DeckListViewModel: ObservableObject {
                         }
                     }
                 }
-                
+
                 print("ローカルデータの移行完了: \(successCount)/\(localDecks.count)個のデッキを移行しました")
-                
+
                 // 移行完了フラグを設定
                 UserDefaults.standard.set(true, forKey: migrationKey)
             } catch {
@@ -160,12 +161,12 @@ class DeckListViewModel: ObservableObject {
     // デッキを保存（Firestoreに保存）
     private func saveDeck(_ deck: Deck) {
         isSaving = true
-        
+
         firestoreManager.saveDeck(deck) { [weak self] error in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isSaving = false
-                
+
                 if let error = error {
                     print("デッキの保存に失敗しました: \(error.localizedDescription)")
                 } else {
@@ -189,12 +190,12 @@ class DeckListViewModel: ObservableObject {
     // デッキを削除
     func deleteDeck(_ deckId: String) {
         isSaving = true
-        
+
         firestoreManager.deleteDeck(deckId) { [weak self] error in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isSaving = false
-                
+
                 if let error = error {
                     print("デッキの削除に失敗しました: \(error.localizedDescription)")
                 } else {
@@ -250,7 +251,7 @@ class DeckListViewModel: ObservableObject {
     // デッキリストを手動でリフレッシュ
     func refreshDecks() async {
         isLoading = true
-        
+
         await withCheckedContinuation { continuation in
             firestoreManager.loadDecks { [weak self] result in
                 Task { @MainActor in
@@ -259,7 +260,7 @@ class DeckListViewModel: ObservableObject {
                         return
                     }
                     self.isLoading = false
-                    
+
                     switch result {
                     case .success(let loadedDecks):
                         self.decks = loadedDecks

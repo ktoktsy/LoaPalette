@@ -211,12 +211,12 @@ struct CardSearchFilterAccessoryView: View {
         }
 
         // Lorcana API searchパラメータ用クエリ文字列.
-        // インクは color~amethyst のように部分一致指定する（APIレスポンスは "Amber, Steel" のような複数色カンマ区切り）.
-        // 複数色は (color~amber;|color~steel;) のようにOR連結.
-        // 参考: https://api-lorcana.com/#/Cards/get%20cards
+        // インクは Color~amethyst のように部分一致指定する（新しいAPIのフィールド名は大文字）.
+        // 複数色は (Color~amber;|Color~steel;) のようにOR連結.
+        // 参考: https://lorcana-api.com/docs/intro
         var searchClause: String {
             let colorValue = rawValue.lowercased()
-            return "color~\(colorValue)"
+            return "Color~\(colorValue)"
         }
     }
 

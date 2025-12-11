@@ -6,66 +6,74 @@ import kotlin.experimental.ExperimentalObjCName
 import kotlin.native.ObjCName
 
 // カードデータモデル（新しいAPI構造）
-// 参考: https://api-lorcana.com/#/Cards/get%20cards
+// 参考: https://lorcana-api.com/docs/intro
 @Serializable
 data class LorcanaCardApiResponse(
+    @SerialName("Name")
+    val name: String? = null,
+    @SerialName("Cost")
     val cost: Int? = null,
-    val inkwell: Boolean? = null,
-    val color: String? = null,
+    @SerialName("Type")
     val type: String? = null,
+    @SerialName("Color")
+    val color: String? = null,
+    @SerialName("Inkable")
+    val inkable: Boolean? = null,
+    @SerialName("Body_Text")
+    val bodyText: String? = null,
+    @SerialName("Flavor_Text")
+    val flavorText: String? = null,
+    @SerialName("Artist")
+    val artist: String? = null,
+    @SerialName("Rarity")
+    val rarity: String? = null,
+    @SerialName("Image")
+    val image: String? = null,
+    @SerialName("Set_Name")
+    val setName: String? = null,
+    @SerialName("Set_ID")
+    val setId: String? = null,
+    @SerialName("Set_Num")
+    val setNum: Int? = null,
+    @SerialName("Strength")
+    val strength: Int? = null,
+    @SerialName("Willpower")
+    val willpower: Int? = null,
+    @SerialName("Lore")
     val lore: Int? = null,
-    val attack: Int? = null,
-    val defence: Int? = null,
-    val variants: List<CardVariant>? = null,
-    val languages: CardLanguages? = null,
-    val classifications: List<CardClassification>? = null,
-    val abilities: List<CardAbility>? = null,
-    val illustrator: String? = null,
-    @SerialName("image_uris")
-    val imageUris: ImageUris? = null
+    @SerialName("Classifications")
+    val classifications: String? = null
 ) {
     // LorcanaCardに変換
     fun toLorcanaCard(): LorcanaCard {
-        val firstVariant = variants?.firstOrNull()
-        val rarityMap = mapOf(
-            "common" to "Common",
-            "uncommon" to "Uncommon",
-            "rare" to "Rare",
-            "super_rare" to "Super Rare",
-            "legendary" to "Legendary"
-        )
-        val variantRarity = firstVariant?.rarity?.let { rarityMap[it] ?: it.replaceFirstChar { it.uppercaseChar() } }
+        // アビリティをBody_Textから抽出（必要に応じて）
+        val abilitiesList = bodyText?.let {
+            if (it.isNotBlank()) {
+                listOf(it)
+            } else {
+                null
+            }
+        }
         
-        val jaString = firstVariant?.ravensburger?.ja
-        val setNumber = jaString?.split("/")?.firstOrNull()?.toIntOrNull()
-        
-        val abilitiesList = abilities?.mapNotNull { 
-            it.title?.en ?: it.ability ?: it.type
-        }?.filter { it.isNotBlank() }
-        
-        // カード名を取得（日本語優先、なければ英語）
-        val cardName = languages?.ja?.name ?: languages?.en?.name
-        
-        // 画像URLを構築（Lorcast APIのimage_uris.digital.largeを優先、なければフォールバック）
-        // 優先順位: image_uris.digital.large > 手動構築URL
-        val imageUrl = imageUris?.digital?.large ?: ImageUrlGenerator.generateFallbackImageUrl(languages?.en)
+        // 分類を文字列からリストに変換
+        val classificationsList = classifications?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() }
         
         return LorcanaCard(
-            id = firstVariant?.id?.toString(),
-            name = cardName,
+            id = setId?.let { "$it-${setNum ?: ""}" },
+            name = name,
             cost = cost,
             color = color,
-            inkwell = inkwell,
+            inkwell = inkable,
             type = type,
-            rarity = variantRarity,
-            set = firstVariant?.set?.uppercase(),
-            setNumber = setNumber,
-            flavorText = languages?.ja?.flavour ?: languages?.en?.flavour ?: "",
-            illustrator = illustrator ?: firstVariant?.illustrator,
-            imageUrl = imageUrl,
+            rarity = rarity,
+            set = setId,
+            setNumber = setNum,
+            flavorText = flavorText ?: "",
+            illustrator = artist,
+            imageUrl = image,
             abilities = abilitiesList,
-            strength = attack,
-            willpower = defence,
+            strength = strength,
+            willpower = willpower,
             lore = lore
         )
     }

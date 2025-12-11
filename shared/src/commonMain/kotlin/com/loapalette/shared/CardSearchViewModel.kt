@@ -51,7 +51,7 @@ class CardSearchViewModel {
     private val pageSize = 20
     
     // 検索実行
-    // API仕様: https://api-lorcana.com/#/Cards/get%20cards
+    // API仕様: https://lorcana-api.com/docs/intro
     fun search(query: String) {
         _searchQuery.value = query
         searchJob?.cancel()

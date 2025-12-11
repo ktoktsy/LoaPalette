@@ -12,19 +12,19 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 // APIクライアント
-// 参考: https://api-lorcana.com/#/Cards/get%20cards
+// 参考: https://lorcana-api.com/docs/intro
 class LorcanaApiClient(private val httpClient: HttpClient) {
     companion object {
-        private const val BASE_URL = "https://api-lorcana.com"
+        private const val BASE_URL = "https://api.lorcana-api.com"
     }
     
     // 全カード取得
     suspend fun getAllCards(page: Int = 1, pageSize: Int = 20): Result<CardsResponse> {
         return withContext(Dispatchers.Default) {
             try {
-                val response = httpClient.get("$BASE_URL/cards") {
-                    parameter("limit", pageSize)
+                val response = httpClient.get("$BASE_URL/cards/all") {
                     parameter("page", page)
+                    parameter("pagesize", pageSize)
                 }
                 val apiCards = response.body<List<LorcanaCardApiResponse>>()
                 val cards = apiCards.map { it.toLorcanaCard() }
@@ -44,10 +44,11 @@ class LorcanaApiClient(private val httpClient: HttpClient) {
     ): Result<CardsResponse> {
         return withContext(Dispatchers.Default) {
             try {
-                val response = httpClient.get("$BASE_URL/cards") {
-                    parameter("limit", pageSize)
-                    parameter("page", page)
+                val response = httpClient.get("$BASE_URL/cards/fetch") {
                     searchQuery?.let { parameter("search", it) }
+                    strict?.let { parameter("strict", it) }
+                    parameter("page", page)
+                    parameter("pagesize", pageSize)
                 }
                 val apiCards = response.body<List<LorcanaCardApiResponse>>()
                 val cards = apiCards.map { it.toLorcanaCard() }
