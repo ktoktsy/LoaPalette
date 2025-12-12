@@ -166,6 +166,8 @@ struct DoubleRangeSlider: View {
 
 // カード検索用のフィルターシートビュー.
 struct CardSearchFilterAccessoryView: View {
+    // 攻撃力・防御力の上限値.
+    static let maxStrengthWillpower: Int = 10
     // フィルター状態を外部からバインディングで受け取る.
     @Binding var selectedFilters: Set<Filter>
     @Binding var nameQuery: String
@@ -474,7 +476,7 @@ struct CardSearchFilterAccessoryView: View {
 
                             Spacer()
 
-                            if minStrength == 0 && maxStrength == 20 {
+                            if minStrength == 0 && maxStrength == Self.maxStrengthWillpower {
                                 Text(String(localized: "条件なし"))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -499,7 +501,7 @@ struct CardSearchFilterAccessoryView: View {
                         DoubleRangeSlider(
                             minValue: $minStrength,
                             maxValue: $maxStrength,
-                            range: 0...20
+                            range: 0...Self.maxStrengthWillpower
                         )
                         .frame(height: 44)
                     }
@@ -514,7 +516,7 @@ struct CardSearchFilterAccessoryView: View {
 
                             Spacer()
 
-                            if minWillpower == 0 && maxWillpower == 20 {
+                            if minWillpower == 0 && maxWillpower == Self.maxStrengthWillpower {
                                 Text(String(localized: "条件なし"))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -539,7 +541,7 @@ struct CardSearchFilterAccessoryView: View {
                         DoubleRangeSlider(
                             minValue: $minWillpower,
                             maxValue: $maxWillpower,
-                            range: 0...20
+                            range: 0...Self.maxStrengthWillpower
                         )
                         .frame(height: 44)
                     }
@@ -792,21 +794,21 @@ struct CardSearchFilterAccessoryView: View {
         }
 
         // 攻撃力範囲.
-        if !(minStrength == 0 && maxStrength == 20) {
+        if !(minStrength == 0 && maxStrength == Self.maxStrengthWillpower) {
             if minStrength > 0 {
                 clauses.append("strength>=\(minStrength)")
             }
-            if maxStrength < 20 {
+            if maxStrength < Self.maxStrengthWillpower {
                 clauses.append("strength<=\(maxStrength)")
             }
         }
 
         // 防御力範囲.
-        if !(minWillpower == 0 && maxWillpower == 20) {
+        if !(minWillpower == 0 && maxWillpower == Self.maxStrengthWillpower) {
             if minWillpower > 0 {
                 clauses.append("willpower>=\(minWillpower)")
             }
-            if maxWillpower < 20 {
+            if maxWillpower < Self.maxStrengthWillpower {
                 clauses.append("willpower<=\(maxWillpower)")
             }
         }
@@ -921,9 +923,9 @@ struct CardSearchFilterAccessoryView: View {
         selectedRarities = []
         inkableFilter = .any
         minStrength = 0
-        maxStrength = 20
+        maxStrength = Self.maxStrengthWillpower
         minWillpower = 0
-        maxWillpower = 20
+        maxWillpower = Self.maxStrengthWillpower
         minLore = 0
         maxLore = 5
         setName = ""
@@ -966,9 +968,9 @@ struct FilterSheetDetentsModifier: ViewModifier {
                 selectedRarities: .constant([]),
                 inkableFilter: .constant(.any),
                 minStrength: .constant(0),
-                maxStrength: .constant(20),
+                maxStrength: .constant(CardSearchFilterAccessoryView.maxStrengthWillpower),
                 minWillpower: .constant(0),
-                maxWillpower: .constant(20),
+                maxWillpower: .constant(CardSearchFilterAccessoryView.maxStrengthWillpower),
                 minLore: .constant(0),
                 maxLore: .constant(5),
                 setName: .constant(""),

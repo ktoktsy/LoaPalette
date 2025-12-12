@@ -240,21 +240,21 @@ struct CardSearchView: View {
                     }
 
                     // 攻撃力範囲
-                    if filterMinStrength != 0 || filterMaxStrength != 10 {
+                    if filterMinStrength != 0 || filterMaxStrength != CardSearchFilterAccessoryView.maxStrengthWillpower {
                         if filterMinStrength != 0 {
                             parameters["min_strength"] = filterMinStrength
                         }
-                        if filterMaxStrength != 10 {
+                        if filterMaxStrength != CardSearchFilterAccessoryView.maxStrengthWillpower {
                             parameters["max_strength"] = filterMaxStrength
                         }
                     }
 
                     // 防御力範囲
-                    if filterMinWillpower != 0 || filterMaxWillpower != 10 {
+                    if filterMinWillpower != 0 || filterMaxWillpower != CardSearchFilterAccessoryView.maxStrengthWillpower {
                         if filterMinWillpower != 0 {
                             parameters["min_willpower"] = filterMinWillpower
                         }
-                        if filterMaxWillpower != 10 {
+                        if filterMaxWillpower != CardSearchFilterAccessoryView.maxStrengthWillpower {
                             parameters["max_willpower"] = filterMaxWillpower
                         }
                     }
