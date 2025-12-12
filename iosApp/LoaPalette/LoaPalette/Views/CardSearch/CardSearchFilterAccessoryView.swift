@@ -186,6 +186,18 @@ struct CardSearchFilterAccessoryView: View {
     // フィルター選択時に呼ばれるコールバック.
     let onSelect: (String) -> Void
 
+    // セット名の選択状態（StringからSetNameへの変換）
+    private var selectedSetName: Binding<SetName> {
+        Binding(
+            get: {
+                SetName(rawValue: setName) ?? .none
+            },
+            set: { newValue in
+                setName = newValue.rawValue
+            }
+        )
+    }
+
     // インクカラーフィルター定義.
     enum Filter: String, CaseIterable, Identifiable {
         case amber = "Amber"
@@ -274,6 +286,46 @@ struct CardSearchFilterAccessoryView: View {
             case .any: return String(localized: "条件なし")
             case .inkable: return String(localized: "インク可能")
             case .notInkable: return String(localized: "インク不可")
+            }
+        }
+    }
+
+    // セット名フィルター定義.
+    enum SetName: String, CaseIterable, Identifiable {
+        case none = ""
+        case archaziasIsland = "ARCHAZIAS ISLAND"
+        case azuriteSea = "AZURITE SEA"
+        case shimmeringSkies = "SHIMMERING SKIES"
+        case ursulasReturn = "URSULA'S RETURN"
+        case intoTheInklands = "INTO THE INKLANDS"
+        case riseOfTheFloodborn = "RISE OF THE FLOODBORN"
+        case theFirstChapter = "THE FIRST CHAPTER"
+
+        var id: String { rawValue }
+
+        var displayName: String {
+            switch self {
+            case .none: return String(localized: "条件なし")
+            case .archaziasIsland: return String(localized: "ARCHAZIAS ISLAND")
+            case .azuriteSea: return String(localized: "AZURITE SEA")
+            case .shimmeringSkies: return String(localized: "SHIMMERING SKIES")
+            case .ursulasReturn: return String(localized: "URSULA'S RETURN")
+            case .intoTheInklands: return String(localized: "INTO THE INKLANDS")
+            case .riseOfTheFloodborn: return String(localized: "RISE OF THE FLOODBORN")
+            case .theFirstChapter: return String(localized: "THE FIRST CHAPTER")
+            }
+        }
+
+        var localizedName: String {
+            switch self {
+            case .none: return String(localized: "条件なし")
+            case .archaziasIsland: return String(localized: "アーケイジアと魔法の島")
+            case .azuriteSea: return String(localized: "大いなるアズライト")
+            case .shimmeringSkies: return String(localized: "星々の輝き")
+            case .ursulasReturn: return String(localized: "逆襲のアースラ")
+            case .intoTheInklands: return String(localized: "インクランド探訪")
+            case .riseOfTheFloodborn: return String(localized: "フラッドボーンの渾沌")
+            case .theFirstChapter: return String(localized: "物語のはじまり")
             }
         }
     }
@@ -533,13 +585,22 @@ struct CardSearchFilterAccessoryView: View {
                     .padding(.horizontal, 16)
 
                     // セット名.
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text(String(localized: "セット名"))
                             .font(.subheadline)
                             .foregroundColor(.primary)
-                        TextField(String(localized: "セット名で検索"), text: $setName)
-                            .textFieldStyle(.roundedBorder)
-                            .padding(.trailing, 4)
+                        Picker(String(localized: "セット名"), selection: selectedSetName) {
+                            ForEach(SetName.allCases) { setNameOption in
+                                if setNameOption == .none {
+                                    Text(setNameOption.displayName)
+                                        .tag(setNameOption)
+                                } else {
+                                    Text("\(setNameOption.localizedName)")
+                                        .tag(setNameOption)
+                                }
+                            }
+                        }
+                        .pickerStyle(.menu)
                     }
                     .padding(.horizontal, 16)
 
