@@ -101,7 +101,7 @@ struct LorcanaCard: Codable, Identifiable {
     }
 
     var id: String {
-        return cardId ?? name ?? UUID().uuidString
+        return "\(setNumber ?? 0)-\(lore ?? 0)-\(name ?? "")"
     }
 }
 

@@ -460,7 +460,7 @@ struct CardSearchView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 16) {
                 LazyVGrid(columns: gridColumns, spacing: 16) {
-                    ForEach(Array(filteredCards.enumerated()), id: \.element.id) { index, card in
+                    ForEach(Array(zip(filteredCards.indices, filteredCards)), id: \.0) { index, card in
                         CardItemView(
                             card: card,
                             isSelected: selectedCards.contains(card.id),
@@ -472,6 +472,7 @@ struct CardSearchView: View {
                                 }
                             }
                         )
+                        .id("\(card.id)-\(index)")
                         .onAppear {
                             // 最後から5件目に到達したら追加読み込み
                             if index == filteredCards.count - 5 && viewModel.hasMore
