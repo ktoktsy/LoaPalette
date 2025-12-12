@@ -1,9 +1,3 @@
-//
-//  CardSearchView.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
 
 import SwiftUI
 
@@ -466,7 +460,7 @@ struct CardSearchView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 16) {
                 LazyVGrid(columns: gridColumns, spacing: 16) {
-                    ForEach(Array(filteredCards.enumerated()), id: \.offset) { index, card in
+                    ForEach(Array(filteredCards.enumerated()), id: \.element.id) { index, card in
                         CardItemView(
                             card: card,
                             isSelected: selectedCards.contains(card.id),

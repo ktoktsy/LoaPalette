@@ -1,9 +1,3 @@
-//
-//  Deck.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
 
 import Foundation
 
@@ -53,9 +47,6 @@ struct Deck: Codable, Identifiable, Equatable {
         self.memo = memo
     }
 
-    // 既存のJSONとの互換性のため、inkColorsが存在しない場合は空配列を使用
-    // matchRecordsが存在しない場合は空配列を使用
-    // 後方互換性: wins/lossesが存在する場合はmatchRecordsに変換
     nonisolated init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
@@ -66,7 +57,6 @@ struct Deck: Codable, Identifiable, Equatable {
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         memo = try container.decodeIfPresent(String.self, forKey: .memo) ?? ""
 
-        // matchRecordsが存在する場合はそれを使用、存在しない場合は空配列
         if let records = try? container.decode([MatchRecord].self, forKey: .matchRecords) {
             matchRecords = records
         } else {
@@ -74,8 +64,6 @@ struct Deck: Codable, Identifiable, Equatable {
             let wins = try container.decodeIfPresent(Int.self, forKey: .wins) ?? 0
             let losses = try container.decodeIfPresent(Int.self, forKey: .losses) ?? 0
             var records: [MatchRecord] = []
-            // 既存のwins/lossesを試合記録に変換（日時はupdatedAtを使用）
-            // nonisolatedコンテキストで作成するため、nonisolatedイニシャライザーを使用
             for _ in 0..<wins {
                 records.append(MatchRecord(id: UUID().uuidString, opponentInkColors: [], opponentDeckName: "", isWin: true, playedAt: updatedAt))
             }
@@ -86,7 +74,6 @@ struct Deck: Codable, Identifiable, Equatable {
         }
     }
 
-    // Encodable準拠のため、matchRecordsをエンコード（wins/lossesは除外）
     nonisolated func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
@@ -97,7 +84,6 @@ struct Deck: Codable, Identifiable, Equatable {
         try container.encode(updatedAt, forKey: .updatedAt)
         try container.encode(matchRecords, forKey: .matchRecords)
         try container.encode(memo, forKey: .memo)
-        // wins/lossesはエンコードしない（matchRecordsから計算可能なため）
     }
 
     // デッキの総カード枚数を計算
@@ -166,7 +152,6 @@ struct Deck: Codable, Identifiable, Equatable {
         updatedAt = Date()
     }
 
-    // Equatable準拠のため
     static func == (lhs: Deck, rhs: Deck) -> Bool {
         lhs.id == rhs.id && lhs.name == rhs.name && lhs.entries == rhs.entries
             && lhs.inkColors == rhs.inkColors && lhs.createdAt == rhs.createdAt

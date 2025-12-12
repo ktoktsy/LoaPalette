@@ -1,9 +1,3 @@
-//
-//  NativeAdvancedAdView.swift
-//  LoaPalette
-//
-//  Created by Auto on 2025/01/XX.
-//
 
 import GoogleMobileAds
 import SwiftUI
@@ -61,7 +55,6 @@ struct NativeAdvancedAdView: UIViewRepresentable {
         let request = Request()
         adLoader.load(request)
 
-        // CoordinatorにadLoaderを保持
         context.coordinator.adLoader = adLoader
         context.coordinator.containerView = containerView
 
@@ -210,7 +203,6 @@ struct NativeAdvancedAdView: UIViewRepresentable {
             // コールトゥアクションボタン
             if let callToAction = nativeAd.callToAction {
                 let ctaButton = UIButton(type: .system)
-                // iOS 15.0以降ではUIButtonConfigurationを使用
                 if #available(iOS 15.0, *) {
                     var config = UIButton.Configuration.filled()
                     config.title = callToAction
@@ -226,7 +218,6 @@ struct NativeAdvancedAdView: UIViewRepresentable {
                     config.background.cornerRadius = 8
                     ctaButton.configuration = config
                 } else {
-                    // iOS 14以前のフォールバック
                     ctaButton.setTitle(callToAction, for: .normal)
                     ctaButton.backgroundColor = .systemBlue
                     ctaButton.setTitleColor(.white, for: .normal)

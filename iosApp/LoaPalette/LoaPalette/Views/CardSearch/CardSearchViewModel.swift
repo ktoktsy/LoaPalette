@@ -1,9 +1,3 @@
-//
-//  CardSearchViewModel.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
 
 import Combine
 import SwiftUI
@@ -106,10 +100,7 @@ class CardSearchViewModel: ObservableObject {
         searchTask = nil
     }
 
-    // API呼び出し
-    // API仕様: https://lorcana-api.com/docs/intro
     private func performSearch(query: String, page: Int) async {
-        // api.lorcana-api.comのエンドポイントを使用
         guard var urlComponents = URLComponents(string: "https://api.lorcana-api.com/cards/fetch")
         else {
             errorMessage = "無効なURLです"

@@ -1,18 +1,9 @@
-//
-//  DeckListViewModel.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
 
 import Combine
 import FirebaseFirestore
 import Foundation
 import SwiftUI
 
-// デッキリスト管理ViewModel
-// Firestoreを使用してデッキを管理
-// 参考: https://firebase.google.com/docs/firestore/ios/start
 @MainActor
 class DeckListViewModel: ObservableObject {
     @Published var decks: [Deck] = []
@@ -37,7 +28,6 @@ class DeckListViewModel: ObservableObject {
         migrateLocalDataIfNeeded()
     }
 
-    // 初回読み込みを実行（リスナー設定前でも確実にデータを取得）
     private func loadInitialDecks() {
         isLoading = true
 
@@ -46,9 +36,7 @@ class DeckListViewModel: ObservableObject {
         }
     }
 
-    // Firestoreのリアルタイム更新リスナーを設定
     private func setupFirestoreListener() {
-        // 既存のリスナーを削除
         listenerRegistration?.remove()
         listenerRegistration = nil
 

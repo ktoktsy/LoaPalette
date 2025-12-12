@@ -1,10 +1,3 @@
-//
-//  SettingsView.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
-
 import GoogleMobileAds
 import SwiftUI
 import UIKit
@@ -52,7 +45,6 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // ネイティブアドバンス広告
                 Section {
                     NativeAdvancedAdView(adUnitID: adUnitID, preloadedNativeAd: preloadedNativeAd)
                         .frame(minHeight: 250)
@@ -101,15 +93,12 @@ struct SettingsView: View {
         }
     }
 
-    /// 広告を読み込む（キャッシュから取得、なければプリロード）
     private func loadAd() {
-        // キャッシュから取得を試みる
         if let cachedAd = AdManager.shared.getPreloadedAd(adUnitID: adUnitID) {
             preloadedNativeAd = cachedAd
             return
         }
 
-        // キャッシュにない場合はプリロードを開始
         AdManager.shared.preloadAd(adUnitID: adUnitID) { nativeAd in
             self.preloadedNativeAd = nativeAd
         }
@@ -158,16 +147,10 @@ struct SettingsView: View {
         .buttonStyle(.plain)
     }
 
-    /// すべてのキャッシュを削除
-    /// 参考: https://developer.apple.com/documentation/foundation/urlcache
     private func clearAllCache() {
-        // URLSessionのキャッシュを削除
         URLCache.shared.removeAllCachedResponses()
-
-        // 広告キャッシュを削除
         AdManager.shared.clearAllAds()
 
-        // アラートを表示
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
             let rootViewController = windowScene.windows.first?.rootViewController
         {

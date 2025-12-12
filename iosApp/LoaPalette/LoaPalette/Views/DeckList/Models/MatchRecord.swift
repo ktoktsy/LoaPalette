@@ -1,9 +1,3 @@
-//
-//  MatchRecord.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
 
 import Foundation
 
@@ -24,9 +18,6 @@ struct MatchRecord: Codable, Identifiable, Equatable {
         case playedAt
     }
 
-    // nonisolatedイニシャライザー
-    // generateDeckNameは@MainActorで分離されている可能性があるため、
-    // nonisolatedコンテキストでは呼び出さない
     nonisolated init(
         id: String = UUID().uuidString,
         opponentInkColors: [Ink] = [],
@@ -36,15 +27,11 @@ struct MatchRecord: Codable, Identifiable, Equatable {
     ) {
         self.id = id
         self.opponentInkColors = opponentInkColors
-        // nonisolatedコンテキストではgenerateDeckNameを呼び出さない
-        // 呼び出し側で必要に応じてデッキ名を設定する
         self.opponentDeckName = opponentDeckName
         self.isWin = isWin
         self.playedAt = playedAt
     }
     
-    // @MainActorコンテキストで使用するためのイニシャライザー
-    // generateDeckNameを呼び出してデッキ名を自動生成
     @MainActor
     init(
         id: String = UUID().uuidString,
@@ -66,8 +53,6 @@ struct MatchRecord: Codable, Identifiable, Equatable {
         self.playedAt = playedAt
     }
 
-    // 既存のJSONとの互換性のため、opponentDeckNameが存在しない場合は空文字列を使用
-    // nonisolatedコンテキストで使用するため、generateDeckNameは呼び出さない
     nonisolated init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
@@ -75,11 +60,8 @@ struct MatchRecord: Codable, Identifiable, Equatable {
         opponentDeckName = try container.decodeIfPresent(String.self, forKey: .opponentDeckName) ?? ""
         isWin = try container.decode(Bool.self, forKey: .isWin)
         playedAt = try container.decode(Date.self, forKey: .playedAt)
-        // nonisolatedコンテキストではgenerateDeckNameを呼び出さない
-        // デコードされた値を使用する
     }
 
-    // Equatable準拠のため
     static func == (lhs: MatchRecord, rhs: MatchRecord) -> Bool {
         lhs.id == rhs.id && lhs.opponentInkColors == rhs.opponentInkColors
             && lhs.opponentDeckName == rhs.opponentDeckName

@@ -15,14 +15,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             LoaPaletteTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    App()
-                }
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                ) { App() }
             }
         }
     }
 }
-
-

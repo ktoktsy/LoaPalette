@@ -1,9 +1,3 @@
-//
-//  LorcanaCard.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
 
 import Foundation
 import shared
@@ -106,13 +100,11 @@ struct LorcanaCard: Codable, Identifiable {
         try container.encodeIfPresent(lore, forKey: .lore)
     }
 
-    // Identifiableプロトコルに必要なidプロパティ
     var id: String {
         return cardId ?? name ?? UUID().uuidString
     }
 }
 
-// APIエラーレスポンス
 struct APIError: Codable {
     let code: String
     let details: String
@@ -120,7 +112,6 @@ struct APIError: Codable {
     let status: Int
 }
 
-// SearchState enum
 enum SearchState: String {
     case idle = "IDLE"
     case loading = "LOADING"

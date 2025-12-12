@@ -1,17 +1,9 @@
-//
-//  CardSearchFilterAccessoryView.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/12/01.
-//
-
 import SwiftUI
 
 #if canImport(UIKit)
     import UIKit
 #endif
 
-// Double Range Sliderコンポーネント.
 struct DoubleRangeSlider: View {
     @Binding var minValue: Int
     @Binding var maxValue: Int
@@ -25,7 +17,6 @@ struct DoubleRangeSlider: View {
     private let thumbTouchArea: CGFloat = 44
     private let padding: CGFloat = 14
 
-    // ハプティックフィードバックジェネレーター.
     #if canImport(UIKit)
         private let impactFeedback = UIImpactFeedbackGenerator(style: .light)
     #endif
@@ -210,10 +201,6 @@ struct CardSearchFilterAccessoryView: View {
             rawValue
         }
 
-        // Lorcana API searchパラメータ用クエリ文字列.
-        // インクは Color~amethyst のように部分一致指定する（新しいAPIのフィールド名は大文字）.
-        // 複数色は (Color~amber;|Color~steel;) のようにOR連結.
-        // 参考: https://lorcana-api.com/docs/intro
         var searchClause: String {
             let colorValue = rawValue.lowercased()
             return "Color~\(colorValue)"
@@ -266,8 +253,6 @@ struct CardSearchFilterAccessoryView: View {
         }
 
         var searchClause: String {
-            // APIのsearchパラメータでrarity=は動作しない場合があるため、部分一致（~）を使用.
-            // 例: rarity~Enchanted, rarity~Super Rare
             return "rarity~\(rawValue)"
         }
 
@@ -347,10 +332,9 @@ struct CardSearchFilterAccessoryView: View {
                                     Capsule()
                                         .fill(Color.accentColor.opacity(0.15))
                                 )
-                            }
                         }
+                    }
 
-                        // Double Range Slider.
                         DoubleRangeSlider(
                             minValue: $minCost,
                             maxValue: $maxCost,
@@ -841,7 +825,6 @@ struct CardSearchFilterAccessoryView: View {
             }
         }
 
-        // OR条件をまとめる.
         var orClauses: [String] = []
         if let colorClause = colorClause {
             orClauses.append(colorClause)
@@ -889,7 +872,6 @@ struct CardSearchFilterAccessoryView: View {
     }
 }
 
-// iOS 16 以降ではシートの高さをデタント指定.
 @available(iOS 16.0, *)
 private struct FilterSheetDetentsModifierImpl: ViewModifier {
     func body(content: Content) -> some View {

@@ -1,9 +1,3 @@
-//
-//  RoaCounterViewModel.swift
-//  LoaPalette
-//
-//  Created by 片岡寿哉 on 2025/11/28.
-//
 
 import Combine
 import SwiftUI
