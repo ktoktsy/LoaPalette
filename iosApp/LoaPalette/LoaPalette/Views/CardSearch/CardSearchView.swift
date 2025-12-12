@@ -34,9 +34,9 @@ struct CardSearchView: View {
     @State private var selectedRarities: Set<CardSearchFilterAccessoryView.Rarity> = []
     @State private var inkableFilter: CardSearchFilterAccessoryView.InkableFilter = .any
     @State private var filterMinStrength: Int = 0
-    @State private var filterMaxStrength: Int = 20
+    @State private var filterMaxStrength: Int = 10
     @State private var filterMinWillpower: Int = 0
-    @State private var filterMaxWillpower: Int = 20
+    @State private var filterMaxWillpower: Int = 10
     @State private var filterMinLore: Int = 0
     @State private var filterMaxLore: Int = 5
     @State private var filterSetName: String = ""
@@ -240,21 +240,21 @@ struct CardSearchView: View {
                     }
 
                     // 攻撃力範囲
-                    if filterMinStrength != 0 || filterMaxStrength != 20 {
+                    if filterMinStrength != 0 || filterMaxStrength != 10 {
                         if filterMinStrength != 0 {
                             parameters["min_strength"] = filterMinStrength
                         }
-                        if filterMaxStrength != 20 {
+                        if filterMaxStrength != 10 {
                             parameters["max_strength"] = filterMaxStrength
                         }
                     }
 
                     // 防御力範囲
-                    if filterMinWillpower != 0 || filterMaxWillpower != 20 {
+                    if filterMinWillpower != 0 || filterMaxWillpower != 10 {
                         if filterMinWillpower != 0 {
                             parameters["min_willpower"] = filterMinWillpower
                         }
-                        if filterMaxWillpower != 20 {
+                        if filterMaxWillpower != 10 {
                             parameters["max_willpower"] = filterMaxWillpower
                         }
                     }
