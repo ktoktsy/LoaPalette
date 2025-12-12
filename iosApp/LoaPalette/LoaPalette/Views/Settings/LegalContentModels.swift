@@ -29,6 +29,3 @@ struct LegalContent: Codable {
         return try? decoder.decode(LegalContent.self, from: data)
     }
 }
-
-
-

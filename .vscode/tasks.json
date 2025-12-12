@@ -1,0 +1,68 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-ios",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "-workspace",
+                "${workspaceFolder}/iosApp/LoaPalette/LoaPalette.xcworkspace",
+                "-scheme",
+                "LoaPalette",
+                "-configuration",
+                "Debug",
+                "-sdk",
+                "iphonesimulator",
+                "-destination",
+                "platform=iOS Simulator,name=iPhone 15",
+                "build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "build-android",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                ":androidApp:assembleDebug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "build-shared",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                ":shared:build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
+
+

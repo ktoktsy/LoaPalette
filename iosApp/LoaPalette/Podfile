@@ -18,6 +18,9 @@ target 'LoaPalette' do
   
   # AdMob
   pod 'Google-Mobile-Ads-SDK'
+  
+  # Hot Reloading
+  pod 'InjectHotReload'
 
 end
 

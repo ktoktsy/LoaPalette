@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "kotlin",
+            "request": "launch",
+            "name": "Android App (Kotlin)",
+            "projectRoot": "${workspaceFolder}",
+            "mainClass": "com.loapalette.android.MainActivity",
+            "modulePaths": [
+                "${workspaceFolder}/androidApp/build/intermediates/classes/debug"
+            ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "iOS App (Swift)",
+            "program": "${workspaceFolder}/iosApp/build/Build/Products/Debug-iphonesimulator/LoaPalette.app",
+            "args": [],
+            "cwd": "${workspaceFolder}/iosApp",
+            "preLaunchTask": "build-ios",
+            "console": "debugConsole"
+        },
+        {
+            "type": "kotlin",
+            "request": "launch",
+            "name": "Shared Module (Kotlin)",
+            "projectRoot": "${workspaceFolder}/shared",
+            "modulePaths": [
+                "${workspaceFolder}/shared/build/classes/kotlin/commonMain"
+            ]
+        }
+    ]
+}
+
+
