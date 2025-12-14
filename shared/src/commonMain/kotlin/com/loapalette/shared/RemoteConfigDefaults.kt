@@ -1,27 +1,22 @@
 package com.loapalette.shared
 
-/**
- * Firebase Remote Configのデフォルト値を定義するオブジェクト
- * 参考: https://firebase.google.com/docs/remote-config
- */
+/** Firebase Remote Configのデフォルト値を定義するオブジェクト 参考: https://firebase.google.com/docs/remote-config */
 object RemoteConfigDefaults {
-    /**
-     * デフォルト値のマップを取得
-     * @return キーとデフォルト値のマップ
-     */
-    fun getDefaults(): Map<String, Any> {
-        return mapOf(
+  /**
+   * デフォルト値のマップを取得
+   * @return キーとデフォルト値のマップ
+   */
+  fun getDefaults(): Map<String, Any> {
+    return mapOf(
             RemoteConfigKeys.DISCLAIMER_CONTENT to getDisclaimerDefault(),
             RemoteConfigKeys.PRIVACY_POLICY_CONTENT to getPrivacyPolicyDefault(),
             RemoteConfigKeys.TERMS_OF_SERVICE_CONTENT to getTermsOfServiceDefault(),
-        )
-    }
-    
-    /**
-     * 免責事項のデフォルト値（JSON文字列）
-     */
-    private fun getDisclaimerDefault(): String {
-        return """
+    )
+  }
+
+  /** 免責事項のデフォルト値（JSON文字列） */
+  private fun getDisclaimerDefault(): String {
+    return """
         {
           "title": "免責事項",
           "sections": [
@@ -61,68 +56,60 @@ object RemoteConfigDefaults {
           "lastUpdated": "2025年1月"
         }
         """.trimIndent()
-    }
-    
-    /**
-     * プライバシーポリシーのデフォルト値（JSON文字列）
-     */
-    private fun getPrivacyPolicyDefault(): String {
-        return """
+  }
+
+  /** プライバシーポリシーのデフォルト値（JSON文字列） */
+  private fun getPrivacyPolicyDefault(): String {
+    return """
         {
           "title": "プライバシーポリシー",
           "introduction": "本プライバシーポリシーは、本アプリ「LoaPalette」（以下「本アプリ」）における、ユーザーの個人情報の取り扱いについて説明するものです。",
           "sections": [
             {
               "title": "1. 収集する情報",
-              "content": "本アプリでは、以下の情報を収集する場合があります：\n• アプリの使用状況データ（クラッシュレポート、パフォーマンスデータなど）\n• 広告の表示・クリックに関するデータ\n• デバイス情報（OSバージョン、デバイスモデルなど）\n• アプリの利用状況に関する匿名化された統計情報"
+              "content": "本アプリでは、以下の情報を収集する場合があります：\n• アプリの使用状況データ（クラッシュレポート、パフォーマンスデータなど）\n• デバイス情報（OSバージョン、デバイスモデルなど）\n• アプリの利用状況に関する匿名化された統計情報"
             },
             {
               "title": "2. 情報の利用目的",
-              "content": "収集した情報は、以下の目的で利用します：\n• アプリの品質向上および不具合の修正\n• 広告の配信および効果測定\n• アプリの機能改善および新機能の開発\n• リモート設定の管理"
+              "content": "収集した情報は、以下の目的で利用します：\n• アプリの品質向上および不具合の修正\n• アプリの機能改善および新機能の開発\n• リモート設定の管理"
             },
             {
               "title": "3. Firebaseサービスの利用",
               "content": "本アプリは、Googleが提供するFirebaseサービスを利用しています。Firebaseを通じて収集される情報の取り扱いについては、Googleのプライバシーポリシーが適用されます。\n\n利用しているFirebaseサービス：\n• Firebase Analytics: アプリの使用状況を分析\n• Firebase Crashlytics: クラッシュレポートの収集\n• Firebase Remote Config: リモート設定の管理\n• Firebase Firestore: データの保存（ユーザーデータを保存する場合）\n• Firebase Authentication: 認証機能（認証機能を使用する場合）\n\nFirebaseのプライバシーポリシー: https://firebase.google.com/support/privacy"
             },
             {
-              "title": "4. Google AdMobの利用",
-              "content": "本アプリは、Google AdMob（Google Mobile Ads SDK）を使用して広告を配信しています。AdMobは、広告の配信、効果測定、不正防止のために、以下の情報を収集・利用する場合があります：\n• デバイス情報（広告ID、デバイスモデル、OSバージョンなど）\n• 広告の表示・クリックに関する情報\n• 位置情報（設定により許可した場合）\n\nGoogle AdMobのプライバシーポリシー: https://policies.google.com/privacy\nGoogleの広告に関する方針: https://policies.google.com/technologies/ads"
+              "title": "4. 情報の共有",
+              "content": "収集した情報は、以下の場合を除き、第三者に提供・共有することはありません：\n• 法令に基づく開示が求められた場合\n• ユーザーの同意がある場合\n• 本アプリのサービス提供に必要な範囲で、信頼できるサービスプロバイダーに委託する場合（Firebaseなど）"
             },
             {
-              "title": "5. 情報の共有",
-              "content": "収集した情報は、以下の場合を除き、第三者に提供・共有することはありません：\n• 法令に基づく開示が求められた場合\n• ユーザーの同意がある場合\n• 本アプリのサービス提供に必要な範囲で、信頼できるサービスプロバイダーに委託する場合（Firebase、Google AdMobなど）"
-            },
-            {
-              "title": "6. データの保存",
+              "title": "5. データの保存",
               "content": "本アプリは、ユーザーが作成したデッキリストやマッチ記録などのデータを、デバイス内に保存します。これらのデータは、アプリを削除すると失われます。クラウドへのバックアップ機能を提供する場合は、別途通知いたします。"
             },
             {
-              "title": "7. ユーザーの権利",
-              "content": "ユーザーは、以下の権利を有します：\n• 個人情報の開示を求める権利\n• 個人情報の訂正・削除を求める権利\n• 広告のパーソナライゼーションを無効にする権利（デバイスの設定から変更可能）\n• アナリティクスの収集を無効にする権利（デバイスの設定から変更可能）"
+              "title": "6. ユーザーの権利",
+              "content": "ユーザーは、以下の権利を有します：\n• 個人情報の開示を求める権利\n• 個人情報の訂正・削除を求める権利\n• アナリティクスの収集を無効にする権利（デバイスの設定から変更可能）"
             },
             {
-              "title": "8. 子どものプライバシー",
+              "title": "7. 子どものプライバシー",
               "content": "本アプリは、13歳未満の子どもを対象としていません。13歳未満の子どもの個人情報を意図的に収集することはありません。"
             },
             {
-              "title": "9. プライバシーポリシーの変更",
+              "title": "8. プライバシーポリシーの変更",
               "content": "当方は、本プライバシーポリシーを予告なく変更する場合があります。変更後のプライバシーポリシーは、本アプリ内に掲載された時点で効力を生じるものとします。重要な変更がある場合は、アプリ内で通知いたします。"
             },
             {
-              "title": "10. お問い合わせ",
+              "title": "9. お問い合わせ",
               "content": "プライバシーに関するご質問やご要望がございましたら、アプリ内の「要望/お問い合わせ」からお問い合わせください。"
             }
           ],
           "lastUpdated": "2025年1月"
         }
         """.trimIndent()
-    }
-    
-    /**
-     * 利用規約のデフォルト値（JSON文字列）
-     */
-    private fun getTermsOfServiceDefault(): String {
-        return """
+  }
+
+  /** 利用規約のデフォルト値（JSON文字列） */
+  private fun getTermsOfServiceDefault(): String {
+    return """
         {
           "title": "利用規約",
           "introduction": "本利用規約（以下「本規約」）は、本アプリ「LoaPalette」（以下「本アプリ」）の利用条件を定めるものです。本アプリを利用することにより、ユーザーは本規約に同意したものとみなされます。",
@@ -152,11 +139,7 @@ object RemoteConfigDefaults {
               "content": "当方は、本アプリの提供を予告なく中断、変更、または終了する権利を有します。また、本アプリの機能、性能、または利用可能性について、一切の保証をいたしません。"
             },
             {
-              "title": "7. 広告",
-              "content": "本アプリには、Google AdMobによる広告が表示されます。広告の内容は、当方が管理するものではなく、広告主が提供するものです。広告の内容やリンク先について、当方は一切の責任を負いません。"
-            },
-            {
-              "title": "8. 免責",
+              "title": "7. 免責",
               "content": "当方は、本アプリの利用により生じた直接的または間接的な損害について、一切の責任を負いません。本アプリの利用は、ユーザーの自己責任において行われるものとします。"
             },
             {
@@ -175,5 +158,5 @@ object RemoteConfigDefaults {
           "lastUpdated": "2025年1月"
         }
         """.trimIndent()
-    }
+  }
 }

@@ -16,9 +16,6 @@ target 'LoaPalette' do
   pod 'Firebase/Firestore'
   pod 'Firebase/Auth'
   
-  # AdMob
-  pod 'Google-Mobile-Ads-SDK'
-  
   # Hot Reloading
   pod 'InjectHotReload'
 

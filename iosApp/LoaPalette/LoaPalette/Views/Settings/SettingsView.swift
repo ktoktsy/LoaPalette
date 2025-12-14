@@ -1,4 +1,3 @@
-import GoogleMobileAds
 import SwiftUI
 import UIKit
 
@@ -29,8 +28,6 @@ private enum SettingsItem: Identifiable {
 }
 
 struct SettingsView: View {
-    @State private var preloadedNativeAd: NativeAd?
-
     private let items: [SettingsItem] = [
         .officialSite,
         .clearCache,
@@ -40,17 +37,9 @@ struct SettingsView: View {
         .contact,
     ]
 
-    private let adUnitID = "ca-app-pub-3940256099942544/3986624511"
-
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    NativeAdvancedAdView(adUnitID: adUnitID, preloadedNativeAd: preloadedNativeAd)
-                        .frame(minHeight: 250)
-                        .frame(maxWidth: .infinity)
-                }
-
                 Section {
                     ForEach(items) { item in
                         switch item {
@@ -87,20 +76,6 @@ struct SettingsView: View {
             }
             .scrollContentBackground(.hidden)
             .navigationTitle(String(localized: "設定"))
-            .onAppear {
-                loadAd()
-            }
-        }
-    }
-
-    private func loadAd() {
-        if let cachedAd = AdManager.shared.getPreloadedAd(adUnitID: adUnitID) {
-            preloadedNativeAd = cachedAd
-            return
-        }
-
-        AdManager.shared.preloadAd(adUnitID: adUnitID) { nativeAd in
-            self.preloadedNativeAd = nativeAd
         }
     }
 
@@ -149,7 +124,6 @@ struct SettingsView: View {
 
     private func clearAllCache() {
         URLCache.shared.removeAllCachedResponses()
-        AdManager.shared.clearAllAds()
 
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
             let rootViewController = windowScene.windows.first?.rootViewController
