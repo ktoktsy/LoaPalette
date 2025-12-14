@@ -556,6 +556,7 @@ struct CardEntryRow: View {
             } else {
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
+                    .aspectRatio(2 / 3, contentMode: .fit)
                     .frame(width: 50, height: 75)
                     .cornerRadius(4)
             }
