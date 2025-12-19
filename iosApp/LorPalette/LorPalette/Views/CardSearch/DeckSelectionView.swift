@@ -65,7 +65,7 @@ struct DeckSelectionView: View {
                     onComplete()
                 }
             } message: {
-                Text(String(localized: "カードを追加するにはログインが必要です。設定画面からログインしてください。"))
+                Text(String(localized: "カードを追加するにはログインが必要です。「その他」タブの設定画面からログインしてください。"))
             }
         }
     }

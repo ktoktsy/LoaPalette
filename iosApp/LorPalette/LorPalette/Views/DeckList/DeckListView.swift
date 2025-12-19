@@ -4,7 +4,6 @@ import SwiftUI
 struct DeckListView: View {
     @StateObject private var viewModel = DeckListViewModel()
     @StateObject private var authManager = AuthenticationManager.shared
-    @Binding var selectedTab: Int
     @Binding var shouldHighlightLogin: Bool
     @State private var selectedDeck: Deck? = nil
     @State private var isNewDeckSheetPresented = false
@@ -44,13 +43,11 @@ struct DeckListView: View {
                     }
                     .alert(String(localized: "ログインが必要です"), isPresented: $showLoginAlert) {
                         Button(String(localized: "OK")) {
-                            // タブを「その他」に切り替え（タグ3）
-                            selectedTab = 3
                             // ログインボタンをハイライトするフラグを設定
                             shouldHighlightLogin = true
                         }
                     } message: {
-                        Text(String(localized: "デッキリストを使用するにはログインが必要です。設定画面からログインしてください。"))
+                        Text(String(localized: "デッキリストを使用するにはログインが必要です。「その他」タブの設定画面からログインしてください。"))
                     }
 
                 // ロード中または保存中のプログレス表示
@@ -373,5 +370,5 @@ struct DeckRowView: View {
 }
 
 #Preview {
-    DeckListView(selectedTab: .constant(1), shouldHighlightLogin: .constant(false))
+    DeckListView(shouldHighlightLogin: .constant(false))
 }

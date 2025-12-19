@@ -1,40 +1,29 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab: Int = 0
     @State private var shouldHighlightLogin: Bool = false
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            RoaCounterView()
-                .tabItem {
-                    Label(String(localized: "ロアカウンター"), systemImage: "timer")
-                }
-                .tag(0)
+        TabView {
+            Tab(String(localized: "ロアカウンター"), systemImage: "timer") {
+                RoaCounterView()
+            }
 
-            DeckListView(selectedTab: $selectedTab, shouldHighlightLogin: $shouldHighlightLogin)
-                .tabItem {
-                    Label(String(localized: "デッキリスト"), systemImage: "list.bullet.rectangle")
-                }
-                .tag(1)
+            Tab(String(localized: "デッキリスト"), systemImage: "list.bullet.rectangle") {
+                DeckListView(shouldHighlightLogin: $shouldHighlightLogin)
+            }
 
-            NewsView()
-                .tabItem {
-                    Label(String(localized: "ニュース"), systemImage: "newspaper")
-                }
-                .tag(2)
+            Tab(String(localized: "ニュース"), systemImage: "newspaper") {
+                NewsView()
+            }
 
-            SettingsView(shouldHighlightLogin: $shouldHighlightLogin)
-                .tabItem {
-                    Label(String(localized: "その他"), systemImage: "gearshape.fill")
-                }
-                .tag(3)
+            Tab(String(localized: "その他"), systemImage: "gearshape.fill") {
+                SettingsView(shouldHighlightLogin: $shouldHighlightLogin)
+            }
             
-            CardSearchView()
-                .tabItem {
-                    Label("検索", systemImage: "magnifyingglass")
-                }
-                .tag(4)
+            Tab(role: .search) {
+                CardSearchView()
+            }
         }
         .tint(.second)
     }
