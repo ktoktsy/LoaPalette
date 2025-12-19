@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 /**
  * Firebase Analyticsのイベント名を定義するオブジェクト

@@ -1,11 +1,11 @@
-# LoaPalette
+# LorPallete
 
 Kotlin Multiplatform (KMP) プロジェクト
 
 ## プロジェクト構造
 
 ```
-LoaPalette/
+LorPallete/
 ├── shared/              # 共有モジュール
 │   ├── commonMain/     # 共通コード
 │   ├── androidMain/    # Android固有コード

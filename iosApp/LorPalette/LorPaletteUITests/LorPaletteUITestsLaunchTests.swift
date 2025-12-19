@@ -1,13 +1,13 @@
 //
-//  LoaPaletteUITestsLaunchTests.swift
-//  LoaPaletteUITests
+//  LorPaletteUITestsLaunchTests.swift
+//  LorPaletteUITests
 //
 //  Created by 片岡寿哉 on 2025/11/28.
 //
 
 import XCTest
 
-final class LoaPaletteUITestsLaunchTests: XCTestCase {
+final class LorPaletteUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

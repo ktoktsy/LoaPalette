@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

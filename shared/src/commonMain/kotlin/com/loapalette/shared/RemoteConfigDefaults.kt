@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 /** Firebase Remote Configのデフォルト値を定義するオブジェクト 参考: https://firebase.google.com/docs/remote-config */
 object RemoteConfigDefaults {
@@ -22,7 +22,7 @@ object RemoteConfigDefaults {
           "sections": [
             {
               "title": "1. 本アプリについて",
-              "content": "本アプリ「LoaPalette」は、ディズニーロルカナ（Disney Lorcana）のカード情報を提供する非公式のアプリケーションです。本アプリは、株式会社タカラトミー、ウォルト・ディズニー・カンパニー、またはその関連会社とは一切関係がありません。"
+              "content": "本アプリ「LorPallete」は、ディズニーロルカナ（Disney Lorcana）のカード情報を提供する非公式のアプリケーションです。本アプリは、株式会社タカラトミー、ウォルト・ディズニー・カンパニー、またはその関連会社とは一切関係がありません。"
             },
             {
               "title": "2. カード画像・データについて",
@@ -63,7 +63,7 @@ object RemoteConfigDefaults {
     return """
         {
           "title": "プライバシーポリシー",
-          "introduction": "本プライバシーポリシーは、本アプリ「LoaPalette」（以下「本アプリ」）における、ユーザーの個人情報の取り扱いについて説明するものです。",
+          "introduction": "本プライバシーポリシーは、本アプリ「LorPallete」（以下「本アプリ」）における、ユーザーの個人情報の取り扱いについて説明するものです。",
           "sections": [
             {
               "title": "1. 収集する情報",
@@ -112,7 +112,7 @@ object RemoteConfigDefaults {
     return """
         {
           "title": "利用規約",
-          "introduction": "本利用規約（以下「本規約」）は、本アプリ「LoaPalette」（以下「本アプリ」）の利用条件を定めるものです。本アプリを利用することにより、ユーザーは本規約に同意したものとみなされます。",
+          "introduction": "本利用規約（以下「本規約」）は、本アプリ「LorPallete」（以下「本アプリ」）の利用条件を定めるものです。本アプリを利用することにより、ユーザーは本規約に同意したものとみなされます。",
           "sections": [
             {
               "title": "1. 規約の適用",

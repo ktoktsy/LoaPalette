@@ -12,8 +12,8 @@
 	"argv": [
 		"/opt/homebrew/bin/xcode-build-server"
 	],
-	"workspace": "/Users/hocus/dev/LoaPalette/iosApp/LoaPalette/LoaPalette.xcworkspace",
-	"build_root": "/Users/hocus/Library/Developer/Xcode/DerivedData/LoaPalette-bwaugbzqjgvqqwgesjajnslrswjd",
-	"scheme": "LoaPalette",
+	"workspace": "/Users/hocus/dev/LorPallete/iosApp/LorPallete/LorPallete.xcworkspace",
+	"build_root": "/Users/hocus/Library/Developer/Xcode/DerivedData/LorPallete-bwaugbzqjgvqqwgesjajnslrswjd",
+	"scheme": "LorPallete",
 	"kind": "xcode"
 }

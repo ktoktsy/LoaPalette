@@ -1,4 +1,4 @@
-package com.loapalette.android
+package com.lorpallete.android
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.loapalette.shared.createApplicationScreenMessage
+import com.lorpallete.shared.createApplicationScreenMessage
 
 @Composable
 fun App() {
@@ -50,7 +50,7 @@ fun GlassEffectCard() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "LoaPalette",
+                text = "LorPallete",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White

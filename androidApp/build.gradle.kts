@@ -38,7 +38,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.loapalette.android"
+    namespace = "com.lorpallete.android"
     compileSdk = 35
 
     sourceSets["main"].manifest.srcFile("src/main/AndroidManifest.xml")
@@ -46,7 +46,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "com.loapalette.android"
+        applicationId = "com.lorpallete.android"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

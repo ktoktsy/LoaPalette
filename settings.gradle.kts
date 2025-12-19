@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LoaPalette"
+rootProject.name = "LorPallete"
 include(":shared")
 include(":androidApp")
 

@@ -28,6 +28,10 @@ private enum SettingsItem: Identifiable {
 }
 
 struct SettingsView: View {
+    @StateObject private var authManager = AuthenticationManager.shared
+    @State private var isSigningIn = false
+    @State private var errorMessage: String?
+    
     private let items: [SettingsItem] = [
         .officialSite,
         .clearCache,
@@ -40,6 +44,71 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // 認証セクション
+                Section {
+                    if authManager.isSignedIn {
+                        // ログイン済みの場合
+                        if let displayName = authManager.displayName {
+                            HStack {
+                                Text(String(localized: "ログイン中"))
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text(displayName)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        if let email = authManager.email {
+                            HStack {
+                                Text(String(localized: "メールアドレス"))
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text(email)
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
+                            }
+                        }
+                        Button {
+                            Task {
+                                await signOut()
+                            }
+                        } label: {
+                            HStack {
+                                Text(String(localized: "ログアウト"))
+                                    .foregroundColor(.red)
+                                Spacer()
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        // 未ログインの場合
+                        Button {
+                            Task {
+                                await signInWithGoogle()
+                            }
+                        } label: {
+                            HStack {
+                                if isSigningIn {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                } else {
+                                    Image(systemName: "person.circle")
+                                }
+                                Text(String(localized: "Googleでログイン"))
+                                    .foregroundColor(.primary)
+                                Spacer()
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isSigningIn)
+                    }
+                    
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                }
+                
                 Section {
                     ForEach(items) { item in
                         switch item {
@@ -76,6 +145,34 @@ struct SettingsView: View {
             }
             .scrollContentBackground(.hidden)
             .navigationTitle(String(localized: "設定"))
+            .onAppear {
+                authManager.checkAuthState()
+            }
+        }
+    }
+    
+    /// Googleログインを実行
+    private func signInWithGoogle() async {
+        isSigningIn = true
+        errorMessage = nil
+        
+        do {
+            try await authManager.signInWithGoogle()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        
+        isSigningIn = false
+    }
+    
+    /// ログアウトを実行
+    private func signOut() async {
+        errorMessage = nil
+        
+        do {
+            try await authManager.signOut()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 
@@ -148,9 +245,13 @@ struct SettingsView: View {
                     .foregroundColor(.primary)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 }
 
 #Preview {
     SettingsView()
 }
+
+

@@ -7,9 +7,9 @@
             "command": "xcodebuild",
             "args": [
                 "-workspace",
-                "${workspaceFolder}/iosApp/LoaPalette/LoaPalette.xcworkspace",
+                "${workspaceFolder}/iosApp/LorPallete/LorPallete.xcworkspace",
                 "-scheme",
-                "LoaPalette",
+                "LorPallete",
                 "-configuration",
                 "Debug",
                 "-sdk",

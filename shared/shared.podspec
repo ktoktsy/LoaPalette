@@ -1,15 +1,22 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'shared'
     spec.version                  = '1.0'
-    spec.homepage                 = 'https://github.com/yourusername/LoaPalette'
+    spec.homepage                 = 'https://github.com/yourusername/LorPallete'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'LoaPalette Shared Module'
+    spec.summary                  = 'LorPallete Shared Module'
     spec.vendored_frameworks      = 'build/cocoapods/framework/shared.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target    = '15.0'
-                
+    
+    # Firebase依存関係を追加
+    spec.dependency 'Firebase/Analytics'
+    spec.dependency 'Firebase/Crashlytics'
+    spec.dependency 'Firebase/RemoteConfig'
+    spec.dependency 'Firebase/Firestore'
+    spec.dependency 'Firebase/Auth'
+    spec.dependency 'GoogleSignIn'
                 
     if !Dir.exist?('build/cocoapods/framework/shared.framework') || Dir.empty?('build/cocoapods/framework/shared.framework')
         raise "

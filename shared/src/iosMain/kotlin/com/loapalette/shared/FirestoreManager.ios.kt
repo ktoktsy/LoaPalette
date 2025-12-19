@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

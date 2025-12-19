@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 import io.ktor.client.*
 import io.ktor.client.engine.android.*

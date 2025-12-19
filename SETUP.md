@@ -1,4 +1,4 @@
-# LoaPalette セットアップガイド
+# LorPallete セットアップガイド
 
 ## 初回セットアップ
 
@@ -21,7 +21,7 @@ gradle wrapper
 4. プロジェクト名: `iosApp`
 5. Interface: SwiftUI
 6. Language: Swift
-7. 保存先: `LoaPalette/iosApp/` ディレクトリ
+7. 保存先: `LorPallete/iosApp/` ディレクトリ
 
 #### CocoaPodsの設定
 
@@ -45,7 +45,7 @@ pod install
 
 #### Xcodeプロジェクトの設定
 
-1. Xcodeで `LoaPalette.xcworkspace` を開く（`.xcodeproj`ではなく）
+1. Xcodeで `LorPallete.xcworkspace` を開く（`.xcodeproj`ではなく）
 2. プロジェクト設定で以下を確認：
    - Deployment Target: iOS 15.0
    - Swift Language Version: Swift 5
@@ -76,7 +76,7 @@ Xcodeから直接ビルドする場合、環境変数を設定する必要があ
 
 1. Android Studioを開く
 2. "Open an Existing Project" を選択
-3. `LoaPalette` ディレクトリを選択
+3. `LorPallete` ディレクトリを選択
 4. Gradle Syncを実行
 
 #### ビルド

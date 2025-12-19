@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 /**
  * Firebase Remote Configの設定キーを定義するオブジェクト

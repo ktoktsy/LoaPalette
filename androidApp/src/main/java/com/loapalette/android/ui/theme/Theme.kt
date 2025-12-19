@@ -1,4 +1,4 @@
-package com.loapalette.android.ui.theme
+package com.lorpallete.android.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -29,7 +29,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun LoaPaletteTheme(
+fun LorPalleteTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit

@@ -1,11 +1,11 @@
-package com.loapalette.android
+package com.lorpallete.android
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.loapalette.shared.RemoteConfigManager
+import com.lorpallete.shared.RemoteConfigManager
 
-class LoaPaletteApplication : Application() {
+class LorPalleteApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(this)

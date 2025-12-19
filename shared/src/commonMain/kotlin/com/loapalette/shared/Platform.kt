@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

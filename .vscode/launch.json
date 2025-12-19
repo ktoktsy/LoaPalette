@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "Android App (Kotlin)",
             "projectRoot": "${workspaceFolder}",
-            "mainClass": "com.loapalette.android.MainActivity",
+            "mainClass": "com.lorpallete.android.MainActivity",
             "modulePaths": [
                 "${workspaceFolder}/androidApp/build/intermediates/classes/debug"
             ]
@@ -15,7 +15,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "iOS App (Swift)",
-            "program": "${workspaceFolder}/iosApp/build/Build/Products/Debug-iphonesimulator/LoaPalette.app",
+            "program": "${workspaceFolder}/iosApp/build/Build/Products/Debug-iphonesimulator/LorPallete.app",
             "args": [],
             "cwd": "${workspaceFolder}/iosApp",
             "preLaunchTask": "build-ios",

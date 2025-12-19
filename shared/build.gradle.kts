@@ -22,8 +22,8 @@ kotlin {
     iosSimulatorArm64()
 
     cocoapods {
-        summary = "LoaPalette Shared Module"
-        homepage = "https://github.com/yourusername/LoaPalette"
+        summary = "LorPallete Shared Module"
+        homepage = "https://github.com/yourusername/LorPallete"
         version = "1.0"
         ios.deploymentTarget = "15.0"
         framework {
@@ -84,7 +84,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.loapalette.shared"
+    namespace = "com.lorpallete.shared"
     compileSdk = 35
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")

@@ -1,13 +1,13 @@
 //
-//  LoaPaletteUITests.swift
-//  LoaPaletteUITests
+//  LorPaletteUITests.swift
+//  LorPaletteUITests
 //
 //  Created by 片岡寿哉 on 2025/11/28.
 //
 
 import XCTest
 
-final class LoaPaletteUITests: XCTestCase {
+final class LorPaletteUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

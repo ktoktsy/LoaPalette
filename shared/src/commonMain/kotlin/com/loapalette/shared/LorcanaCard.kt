@@ -1,4 +1,4 @@
-package com.loapalette.shared
+package com.lorpallete.shared
 
 import kotlin.experimental.ExperimentalObjCName
 import kotlin.native.ObjCName
