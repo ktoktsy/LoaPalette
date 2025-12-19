@@ -12,9 +12,11 @@ struct DeckSelectionView: View {
     @ObservedObject var deckListViewModel: DeckListViewModel
     let onComplete: () -> Void
 
+    @StateObject private var authManager = AuthenticationManager.shared
     @State private var selectedDeckId: String? = nil
     @State private var isNewDeckSheetPresented = false
     @State private var newDeckName: String = ""
+    @State private var showLoginAlert = false
 
     var selectedCards: [LorcanaCard] {
         cards.filter { selectedCardIds.contains($0.id) }
@@ -44,6 +46,12 @@ struct DeckSelectionView: View {
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String(localized: "追加")) {
+                        // 認証チェック
+                        authManager.checkAuthState()
+                        if !authManager.isSignedIn {
+                            showLoginAlert = true
+                            return
+                        }
                         addCardsToDeck()
                     }
                     .disabled(selectedDeckId == nil)
@@ -51,6 +59,13 @@ struct DeckSelectionView: View {
             }
             .sheet(isPresented: $isNewDeckSheetPresented) {
                 newDeckSheet
+            }
+            .alert(String(localized: "ログインが必要です"), isPresented: $showLoginAlert) {
+                Button(String(localized: "OK")) {
+                    onComplete()
+                }
+            } message: {
+                Text(String(localized: "カードを追加するにはログインが必要です。設定画面からログインしてください。"))
             }
         }
     }

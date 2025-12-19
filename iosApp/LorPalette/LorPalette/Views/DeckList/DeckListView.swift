@@ -3,11 +3,15 @@ import SwiftUI
 
 struct DeckListView: View {
     @StateObject private var viewModel = DeckListViewModel()
+    @StateObject private var authManager = AuthenticationManager.shared
+    @Binding var selectedTab: Int
+    @Binding var shouldHighlightLogin: Bool
     @State private var selectedDeck: Deck? = nil
     @State private var isNewDeckSheetPresented = false
     @State private var newDeckName: String = ""
     @State private var selectedInkColors: Set<Ink> = []
     @State private var previousInkColors: Set<Ink> = []  // 以前のインクの組み合わせを追跡
+    @State private var showLoginAlert = false
 
     var body: some View {
         NavigationStack {
@@ -34,6 +38,19 @@ struct DeckListView: View {
                     }
                     .sheet(isPresented: $isNewDeckSheetPresented) {
                         newDeckSheet
+                    }
+                    .onAppear {
+                        checkAuthentication()
+                    }
+                    .alert(String(localized: "ログインが必要です"), isPresented: $showLoginAlert) {
+                        Button(String(localized: "OK")) {
+                            // タブを「その他」に切り替え（タグ3）
+                            selectedTab = 3
+                            // ログインボタンをハイライトするフラグを設定
+                            shouldHighlightLogin = true
+                        }
+                    } message: {
+                        Text(String(localized: "デッキリストを使用するにはログインが必要です。設定画面からログインしてください。"))
                     }
 
                 // ロード中または保存中のプログレス表示
@@ -263,6 +280,12 @@ struct DeckListView: View {
     }
 
     private func createNewDeck() {
+        // 認証チェック
+        guard authManager.isSignedIn else {
+            showLoginAlert = true
+            return
+        }
+        
         let trimmedName = newDeckName.trimmingCharacters(in: .whitespacesAndNewlines)
         let inkColors = Array(selectedInkColors).sorted { $0.rawValue < $1.rawValue }
 
@@ -275,6 +298,13 @@ struct DeckListView: View {
         newDeckName = ""
         selectedInkColors.removeAll()
         previousInkColors.removeAll()
+    }
+    
+    private func checkAuthentication() {
+        authManager.checkAuthState()
+        if !authManager.isSignedIn {
+            showLoginAlert = true
+        }
     }
 }
 
@@ -343,5 +373,5 @@ struct DeckRowView: View {
 }
 
 #Preview {
-    DeckListView()
+    DeckListView(selectedTab: .constant(1), shouldHighlightLogin: .constant(false))
 }

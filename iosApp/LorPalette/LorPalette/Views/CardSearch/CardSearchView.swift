@@ -8,12 +8,14 @@ import SwiftUI
 struct CardSearchView: View {
     @StateObject private var viewModel = CardSearchViewModel()
     @StateObject private var deckListViewModel = DeckListViewModel()
+    @StateObject private var authManager = AuthenticationManager.shared
     @State private var searchText = ""
     @State private var timer: Timer?
     @State private var isFilterSheetPresented = false
     @State private var hasLoggedSearchFieldTap = false
     @State private var selectedCards: Set<String> = []
     @State private var isDeckSelectionPresented = false
+    @State private var showLoginAlert = false
     @Environment(\.dismiss) private var dismiss
 
     // シート表示かどうか（デッキ詳細から遷移した場合など）
@@ -150,6 +152,13 @@ struct CardSearchView: View {
                         Spacer()
 
                         Button {
+                            // 認証チェック
+                            authManager.checkAuthState()
+                            if !authManager.isSignedIn {
+                                showLoginAlert = true
+                                return
+                            }
+                            
                             if let targetDeckId = targetDeckId {
                                 // デッキ詳細から遷移した場合、直接そのデッキに追加
                                 addCardsToTargetDeck(deckId: targetDeckId)
@@ -323,6 +332,13 @@ struct CardSearchView: View {
                     isDeckSelectionPresented = false
                 }
             )
+        }
+        .alert(String(localized: "ログインが必要です"), isPresented: $showLoginAlert) {
+            Button(String(localized: "OK")) {
+                dismiss()
+            }
+        } message: {
+            Text(String(localized: "カードを追加するにはログインが必要です。設定画面からログインしてください。"))
         }
     }
 

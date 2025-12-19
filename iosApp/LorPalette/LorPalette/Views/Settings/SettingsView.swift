@@ -29,8 +29,10 @@ private enum SettingsItem: Identifiable {
 
 struct SettingsView: View {
     @StateObject private var authManager = AuthenticationManager.shared
+    @Binding var shouldHighlightLogin: Bool
     @State private var isSigningIn = false
     @State private var errorMessage: String?
+    @State private var isAnimating = false
     
     private let items: [SettingsItem] = [
         .officialSite,
@@ -40,6 +42,10 @@ struct SettingsView: View {
         .disclaimer,
         .contact,
     ]
+    
+    init(shouldHighlightLogin: Binding<Bool> = .constant(false)) {
+        self._shouldHighlightLogin = shouldHighlightLogin
+    }
 
     var body: some View {
         NavigationStack {
@@ -97,9 +103,18 @@ struct SettingsView: View {
                                     .foregroundColor(.primary)
                                 Spacer()
                             }
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(isAnimating ? Color.accentColor.opacity(0.2) : Color.clear)
+                            )
+                            .scaleEffect(isAnimating ? 1.05 : 1.0)
+                            .shadow(color: isAnimating ? Color.accentColor.opacity(0.5) : Color.clear, radius: 8, x: 0, y: 4)
                         }
                         .buttonStyle(.plain)
                         .disabled(isSigningIn)
+                        .id("loginButton")
                     }
                     
                     if let errorMessage = errorMessage {
@@ -147,6 +162,15 @@ struct SettingsView: View {
             .navigationTitle(String(localized: "設定"))
             .onAppear {
                 authManager.checkAuthState()
+                // ログインボタンをハイライトする必要がある場合、アニメーションを開始
+                if shouldHighlightLogin && !authManager.isSignedIn {
+                    startHighlightAnimation()
+                }
+            }
+            .onChange(of: shouldHighlightLogin) { oldValue, newValue in
+                if newValue && !authManager.isSignedIn {
+                    startHighlightAnimation()
+                }
             }
         }
     }
@@ -173,6 +197,24 @@ struct SettingsView: View {
             try await authManager.signOut()
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+    
+    /// ログインボタンのハイライトアニメーションを開始
+    private func startHighlightAnimation() {
+        // 少し遅延させてからアニメーション開始（画面遷移のアニメーションが完了してから）
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.easeInOut(duration: 0.6).repeatCount(3, autoreverses: true)) {
+                isAnimating = true
+            }
+            
+            // アニメーション完了後にフラグをリセット
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                withAnimation {
+                    isAnimating = false
+                    shouldHighlightLogin = false
+                }
+            }
         }
     }
 

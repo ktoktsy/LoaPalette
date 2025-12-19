@@ -15,6 +15,7 @@ struct DeckDetailView: View {
         viewModel.decks.first { $0.id == initialDeck.id } ?? initialDeck
     }
 
+    @StateObject private var authManager = AuthenticationManager.shared
     @State private var isEditMode = false
     @State private var editedDeckName: String = ""
     @State private var editedInkColors: Set<Ink> = []
@@ -27,6 +28,7 @@ struct DeckDetailView: View {
     @State private var isMatchRecordsFullScreenPresented = false  // 試合記録フルスクリーン表示
     @State private var isWinLossSectionExpanded = false  // 勝敗記録セクションの展開状態（デフォルト: 閉じる）
     @State private var isMemoSectionExpanded = true  // メモセクションの展開状態（デフォルト: 開く）
+    @State private var showLoginAlert = false
 
     // カード表示モード
     enum CardDisplayMode: Equatable {
@@ -123,6 +125,13 @@ struct DeckDetailView: View {
                 }
             } message: {
                 Text(String(localized: "このデッキを削除してもよろしいですか？"))
+            }
+            .alert(String(localized: "ログインが必要です"), isPresented: $showLoginAlert) {
+                Button(String(localized: "OK")) {
+                    onDismiss()
+                }
+            } message: {
+                Text(String(localized: "カードを追加するにはログインが必要です。設定画面からログインしてください。"))
             }
             .fullScreenCover(isPresented: $isCardSearchPresented) {
                 let currentDeck = deck
@@ -231,7 +240,13 @@ struct DeckDetailView: View {
             // 60枚以下の場合、検索画面への動線を表示
             if deck.totalCardCount < 60 {
                 Button {
-                    isCardSearchPresented = true
+                    // 認証チェック
+                    authManager.checkAuthState()
+                    if authManager.isSignedIn {
+                        isCardSearchPresented = true
+                    } else {
+                        showLoginAlert = true
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "magnifyingglass")
